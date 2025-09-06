@@ -24,7 +24,7 @@ const AppHeader = ({
       left: 0,
       right: 0,
       height: '60px',
-      background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+      background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
       color: 'white',
       display: 'flex',
       alignItems: 'center',

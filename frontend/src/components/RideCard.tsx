@@ -39,7 +39,8 @@ const RideCard = ({ offer, onAppRedirect, isRecommended = false, isTopChoice = f
         cursor: 'pointer',
         transition: 'transform 0.2s, box-shadow 0.2s',
         position: 'relative',
-        border: isRecommended ? '2px solid #28a745' : isTopChoice ? '2px solid #007bff' : '1px solid #e0e0e0'
+        border: isRecommended ? '2px solid #27ae60' : isTopChoice ? '2px solid #3498db' : '1px solid #ecf0f1',
+        background: 'white'
       }}
       onClick={handleRedirect}
       onMouseEnter={(e) => {
@@ -56,15 +57,17 @@ const RideCard = ({ offer, onAppRedirect, isRecommended = false, isTopChoice = f
           position: 'absolute',
           top: '-1px',
           right: '16px',
-          background: '#28a745',
+          background: 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)',
           color: 'white',
-          padding: '4px 12px',
-          borderRadius: '0 0 8px 8px',
-          fontSize: '11px',
-          fontWeight: '700',
-          zIndex: 10
+          padding: '6px 14px',
+          borderRadius: '0 0 12px 12px',
+          fontSize: '10px',
+          fontWeight: '600',
+          zIndex: 10,
+          letterSpacing: '0.5px',
+          boxShadow: '0 2px 8px rgba(39,174,96,0.3)'
         }}>
-          ⭐ RECOMMENDED
+          ⭐ BEST VALUE
         </div>
       )}
       {isTopChoice && !isRecommended && (
@@ -72,15 +75,17 @@ const RideCard = ({ offer, onAppRedirect, isRecommended = false, isTopChoice = f
           position: 'absolute',
           top: '-1px',
           right: '16px',
-          background: '#007bff',
+          background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)',
           color: 'white',
-          padding: '4px 12px',
-          borderRadius: '0 0 8px 8px',
-          fontSize: '11px',
-          fontWeight: '700',
-          zIndex: 10
+          padding: '6px 14px',
+          borderRadius: '0 0 12px 12px',
+          fontSize: '10px',
+          fontWeight: '600',
+          zIndex: 10,
+          letterSpacing: '0.5px',
+          boxShadow: '0 2px 8px rgba(52,152,219,0.3)'
         }}>
-          🏆 BEST CHOICE
+          🏆 TOP PICK
         </div>
       )}
       {/* Provider Header */}
@@ -151,16 +156,29 @@ const RideCard = ({ offer, onAppRedirect, isRecommended = false, isTopChoice = f
             ₹{offer.total_fare}
           </div>
           <button 
-            className="btn btn-primary" 
+            className="btn" 
             style={{ 
-              padding: '6px 12px', 
-              fontSize: '12px',
-              fontWeight: '600',
-              borderRadius: '6px'
+              padding: '10px 16px', 
+              fontSize: '13px',
+              fontWeight: '500',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)',
+              color: 'white',
+              border: 'none',
+              boxShadow: '0 3px 12px rgba(52,152,219,0.3)',
+              transition: 'all 0.2s ease'
             }}
             onClick={handleRedirect}
+            onMouseEnter={(e) => {
+              (e.target as HTMLElement).style.transform = 'translateY(-1px)';
+              (e.target as HTMLElement).style.boxShadow = '0 5px 16px rgba(52,152,219,0.4)';
+            }}
+            onMouseLeave={(e) => {
+              (e.target as HTMLElement).style.transform = 'translateY(0)';
+              (e.target as HTMLElement).style.boxShadow = '0 3px 12px rgba(52,152,219,0.3)';
+            }}
           >
-            Book on {offer.provider}
+            Book with {offer.provider}
           </button>
         </div>
       </div>

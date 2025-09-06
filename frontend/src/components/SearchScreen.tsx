@@ -84,25 +84,37 @@ const SearchScreen = () => {
   return (
     <AppLayout title="CABA">
       <div className="screen" style={{ paddingBottom: '20px' }}>
-        {/* Find a Ride - Priority Section at Top */}
+        {/* Find a Ride - Professional Section */}
         <div style={{
-          background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+          background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
           color: 'white',
-          padding: '20px 16px',
-          borderRadius: '12px',
-          margin: '16px 0',
+          padding: '32px 24px',
+          borderRadius: '20px',
+          margin: '24px 0',
           position: 'sticky',
           top: '60px',
-          zIndex: 100
+          zIndex: 100,
+          boxShadow: '0 16px 40px rgba(44,62,80,0.3)',
+          border: '1px solid rgba(255,255,255,0.1)'
         }}>
-          <h1 style={{ 
-            margin: '0 0 16px 0', 
-            fontSize: '24px', 
-            fontWeight: '700',
-            textAlign: 'center'
-          }}>
-            🚗 Find Your Ride
-          </h1>
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <h1 style={{ 
+              margin: '0 0 8px 0', 
+              fontSize: '28px', 
+              fontWeight: '300',
+              letterSpacing: '0.5px'
+            }}>
+              Compare & Book Rides
+            </h1>
+            <p style={{ 
+              margin: 0, 
+              fontSize: '14px', 
+              opacity: 0.8,
+              fontWeight: '300'
+            }}>
+              Get the best prices across all major ride-hailing platforms
+            </p>
+          </div>
 
           <div style={{ position: 'relative', marginBottom: '16px' }}>
             <LocationInput
@@ -169,20 +181,38 @@ const SearchScreen = () => {
             disabled={loading}
             style={{ 
               width: '100%', 
-              background: 'white',
-              color: '#1e3c72',
+              background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)',
+              color: 'white',
               border: 'none',
-              padding: '14px',
-              borderRadius: '8px',
+              padding: '16px',
+              borderRadius: '12px',
               fontSize: '16px',
-              fontWeight: '700',
-              marginTop: '8px'
+              fontWeight: '500',
+              marginTop: '16px',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 15px rgba(52,152,219,0.3)',
+              cursor: loading ? 'default' : 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                (e.target as HTMLElement).style.transform = 'translateY(-2px)';
+                (e.target as HTMLElement).style.boxShadow = '0 8px 25px rgba(52,152,219,0.4)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                (e.target as HTMLElement).style.transform = 'translateY(0)';
+                (e.target as HTMLElement).style.boxShadow = '0 4px 15px rgba(52,152,219,0.3)';
+              }
             }}
           >
             {loading ? (
-              <div className="spinner" style={{ width: '20px', height: '20px' }}></div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <div className="spinner" style={{ width: '20px', height: '20px' }}></div>
+                <span>Searching...</span>
+              </div>
             ) : (
-              '🔍 Search Rides Now'
+              'Find Best Rides'
             )}
           </button>
         </div>

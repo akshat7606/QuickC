@@ -5,6 +5,8 @@ import VehicleSelector from './VehicleSelector';
 import RideCard from './RideCard';
 import ComparisonSummary from './ComparisonSummary';
 import AppLayout from './AppLayout';
+import LoadingAnimation from './LoadingAnimation';
+import ProfessionalCard from './ProfessionalCard';
 import type { RideOffer } from '../types/rides';
 
 const ResultsScreen = () => {
@@ -184,25 +186,6 @@ const ResultsScreen = () => {
           </button>
         </div>
 
-      {/* Recommended Rides Section - At Top */}
-      {filteredOffers.length > 0 && (
-        <div style={{
-          background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
-          color: 'white',
-          padding: '16px',
-          borderRadius: '12px',
-          margin: '16px 0',
-          textAlign: 'center'
-        }}>
-          <h2 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '700' }}>
-            ⭐ Recommended Rides
-          </h2>
-          <p style={{ margin: 0, fontSize: '14px', opacity: 0.9 }}>
-            Best value rides based on price, rating & ETA
-          </p>
-        </div>
-      )}
-
       {/* Trivago-style Comparison Summary */}
       <ComparisonSummary offers={allOffers} filteredOffers={filteredOffers} />
 
@@ -211,10 +194,7 @@ const ResultsScreen = () => {
 
       {/* Ride Results */}
       {allOffers.length === 0 ? (
-        <div className="loading">
-          <div className="spinner"></div>
-          <p>Finding best rides across all apps...</p>
-        </div>
+        <LoadingAnimation text="Analyzing ride options..." />
       ) : filteredOffers.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6c757d' }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>🚗</div>
@@ -233,6 +213,88 @@ const ResultsScreen = () => {
             />
           ))}
         </div>
+
+        {/* Recommended Rides Section - Moved Down */}
+        {filteredOffers.length > 3 && (
+          <div style={{
+            background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
+            color: 'white',
+            padding: '24px',
+            borderRadius: '16px',
+            margin: '32px 0 16px 0',
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }}>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: '0 0 8px 0', fontSize: '20px', fontWeight: '600' }}>
+                Our Smart Recommendations
+              </h3>
+              <p style={{ margin: 0, fontSize: '14px', opacity: 0.8 }}>
+                AI-powered suggestions based on price optimization, ratings & efficiency
+              </p>
+            </div>
+            
+            <div style={{ 
+              display: 'grid', 
+              gap: '16px',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))'
+            }}>
+              {filteredOffers.filter(offer => isRecommendedRide(offer)).slice(0, 2).map((offer) => (
+                <div
+                  key={`rec-${offer.id}`}
+                  style={{
+                    background: 'rgba(255,255,255,0.1)',
+                    borderRadius: '12px',
+                    padding: '16px',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.target as HTMLElement).style.background = 'rgba(255,255,255,0.15)';
+                    (e.target as HTMLElement).style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.target as HTMLElement).style.background = 'rgba(255,255,255,0.1)';
+                    (e.target as HTMLElement).style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                    <img 
+                      src={offer.provider_logo} 
+                      alt={offer.provider}
+                      style={{ width: '32px', height: '32px', borderRadius: '6px' }}
+                    />
+                    <div>
+                      <div style={{ fontWeight: '600', fontSize: '16px' }}>{offer.provider}</div>
+                      <div style={{ fontSize: '12px', opacity: 0.8 }}>{offer.vehicle_name}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: '18px', fontWeight: '700' }}>₹{offer.total_fare}</div>
+                      <div style={{ fontSize: '12px', opacity: 0.8 }}>{offer.eta_minutes} min • ⭐ {offer.rating}</div>
+                    </div>
+                    <button
+                      onClick={() => handleAppRedirect(offer)}
+                      style={{
+                        background: 'white',
+                        color: '#2c3e50',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '8px 16px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Book Now
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       )}
 
         {/* Vehicle Type Selector - Fixed at bottom */}
