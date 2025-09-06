@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LocationInput from './LocationInput';
 import LocationMap from './LocationMap';
-import { LocationSuggestion } from '../services/locationService';
+import type { LocationSuggestion } from '../services/locationService';
 
 const SearchScreen = () => {
   const navigate = useNavigate();

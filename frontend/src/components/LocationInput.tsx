@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { locationService, LocationSuggestion } from '../services/locationService';
+import { locationService } from '../services/locationService';
+import type { LocationSuggestion } from '../services/locationService';
 
 interface LocationInputProps {
   label: string;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { LocationSuggestion } from '../services/locationService';
+import type { LocationSuggestion } from '../services/locationService';
 
 interface LocationMapProps {
   pickupLocation?: LocationSuggestion;
