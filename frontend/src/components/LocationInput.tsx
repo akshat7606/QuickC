@@ -44,7 +44,11 @@ const LocationInput = ({ label, placeholder, value, onChange, showCurrentLocatio
   };
 
   const handleInputFocus = () => {
-    // Always show suggestions when focused, like Uber\n    const locationSuggestions = locationService.searchLocations(value);\n    setSuggestions(locationSuggestions);\n    setShowSuggestions(true);\n  };
+    // Always show suggestions when focused, like Uber
+    const locationSuggestions = locationService.searchLocations(value);
+    setSuggestions(locationSuggestions);
+    setShowSuggestions(true);
+  };
 
   const handleSuggestionClick = (suggestion: LocationSuggestion) => {
     const formattedLocation = locationService.formatLocation(suggestion);
