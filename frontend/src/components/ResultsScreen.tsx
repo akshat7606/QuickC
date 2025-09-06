@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import SortOptions from './SortOptions';
 import VehicleSelector from './VehicleSelector';
 import RideCard from './RideCard';
+import ComparisonSummary from './ComparisonSummary';
 import type { RideOffer } from '../types/rides';
 
 const ResultsScreen = () => {
@@ -128,22 +129,8 @@ const ResultsScreen = () => {
         <h1 className="screen-title">Compare Rides</h1>
       </div>
 
-      {/* Results Summary */}
-      <div style={{
-        background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
-        padding: '16px',
-        borderRadius: '12px',
-        marginBottom: '16px',
-        textAlign: 'center'
-      }}>
-        <div style={{ fontSize: '24px', fontWeight: '700', color: '#1e3c72', marginBottom: '4px' }}>
-          {filteredOffers.length} Rides Available
-        </div>
-        <div style={{ fontSize: '14px', color: '#6c757d' }}>
-          From {allOffers.reduce((acc, offer) => Math.min(acc, offer.total_fare), Infinity) || 0}₹ • 
-          Fastest in {allOffers.reduce((acc, offer) => Math.min(acc, offer.eta_minutes), Infinity) || 0} min
-        </div>
-      </div>
+      {/* Trivago-style Comparison Summary */}
+      <ComparisonSummary offers={allOffers} filteredOffers={filteredOffers} />
 
       {/* Sort Options */}
       <SortOptions selectedSort={selectedSort} onSortChange={setSelectedSort} />

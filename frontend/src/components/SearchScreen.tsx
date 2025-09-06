@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LocationInput from './LocationInput';
 import LocationMap from './LocationMap';
+import TrivagoBanner from './TrivagoBanner';
+import ThreeStepProcess from './ThreeStepProcess';
 import type { LocationSuggestion } from '../services/locationService';
 
 const SearchScreen = () => {
@@ -61,6 +63,9 @@ const SearchScreen = () => {
 
   return (
     <div className="screen">
+      {/* Trivago-style banner */}
+      <TrivagoBanner />
+
       <div className="screen-header">
         <h1 className="screen-title">Find a Ride</h1>
       </div>
@@ -105,6 +110,9 @@ const SearchScreen = () => {
         <h3>📞 Need help? Call us!</h3>
         <p>Call <strong>+91-XXXX-XXXX</strong> to book a ride via phone</p>
       </div>
+
+      {/* Three-step process */}
+      <ThreeStepProcess />
     </div>
   );
 };
