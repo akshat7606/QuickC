@@ -18,7 +18,7 @@ const SearchScreen = () => {
   const [loading, setLoading] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [mapFor, setMapFor] = useState<'pickup' | 'destination' | null>(null);
-  const { isOnline, showOfflineNotification, dismissOfflineNotification } = useNetworkStatus();
+  const { isOnline, showOfflineNotification, dismissOfflineNotification, retryConnection } = useNetworkStatus();
 
   const handlePickupChange = (value: string, location?: LocationSuggestion) => {
     setPickup(value);
@@ -104,6 +104,7 @@ const SearchScreen = () => {
         isVisible={showOfflineNotification}
         onDismiss={dismissOfflineNotification}
         onCallIVR={handleCallIVR}
+        onRetry={retryConnection}
       />
       
       <div className="screen" style={{ paddingBottom: '20px' }}>

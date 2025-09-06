@@ -2,9 +2,10 @@ interface OfflineNotificationProps {
   isVisible: boolean;
   onDismiss: () => void;
   onCallIVR: () => void;
+  onRetry?: () => void;
 }
 
-const OfflineNotification = ({ isVisible, onDismiss, onCallIVR }: OfflineNotificationProps) => {
+const OfflineNotification = ({ isVisible, onDismiss, onCallIVR, onRetry }: OfflineNotificationProps) => {
   if (!isVisible) return null;
 
   return (
@@ -50,6 +51,24 @@ const OfflineNotification = ({ isVisible, onDismiss, onCallIVR }: OfflineNotific
             >
               📞 Call +91-9981910866
             </button>
+            
+            {onRetry && (
+              <button
+                onClick={onRetry}
+                style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  color: 'white',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  borderRadius: '8px',
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer'
+                }}
+              >
+                🔄 Retry
+              </button>
+            )}
             
             <button
               onClick={onDismiss}
