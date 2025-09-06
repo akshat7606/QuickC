@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import AppLayout from './AppLayout';
 
 interface Booking {
   booking_id: string;
@@ -55,10 +56,11 @@ const HistoryScreen = () => {
   };
 
   return (
-    <div className="screen">
-      <div className="screen-header">
-        <h1 className="screen-title">Ride History</h1>
-      </div>
+    <AppLayout title="Trip History">
+      <div className="screen">
+        <div className="screen-header">
+          <h1 className="screen-title">Ride History</h1>
+        </div>
 
       <div className="form-group">
         <label className="form-label">Your Phone Number</label>
@@ -147,7 +149,8 @@ const HistoryScreen = () => {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </AppLayout>
   );
 };
 
