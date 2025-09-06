@@ -55,10 +55,17 @@ const ResultsScreen = () => {
       filtered = filtered.filter(offer => offer.vehicle_type === selectedVehicle);
     }
     
-    // Sort offers by multiple criteria
-    if (selectedSorts.length > 0) {
-      filtered.sort((a, b) => {
-        // Apply each sort in order, with later sorts as tiebreakers
+    // Sort offers with recommended rides at top
+    filtered.sort((a, b) => {
+      // Priority 1: Recommended rides (best value rides) go first
+      const aIsRecommended = isRecommendedRide(a);
+      const bIsRecommended = isRecommendedRide(b);
+      
+      if (aIsRecommended && !bIsRecommended) return -1;
+      if (!aIsRecommended && bIsRecommended) return 1;
+      
+      // Priority 2: Apply user-selected sorts
+      if (selectedSorts.length > 0) {
         for (const sortType of selectedSorts) {
           let comparison = 0;
           switch (sortType) {
@@ -77,12 +84,34 @@ const ResultsScreen = () => {
           }
           if (comparison !== 0) return comparison;
         }
-        return 0;
-      });
-    }
+      }
+      
+      // Priority 3: Default to price if no sorts selected
+      return a.total_fare - b.total_fare;
+    });
     
     setFilteredOffers(filtered);
   }, [allOffers, selectedSorts, selectedVehicle]);
+
+  // Determine if a ride is recommended (best value)
+  const isRecommendedRide = (offer: RideOffer): boolean => {
+    if (allOffers.length === 0) return false;
+    
+    // Calculate value score: rating/price ratio with ETA consideration
+    const priceScore = 1 / (offer.total_fare / Math.min(...allOffers.map(o => o.total_fare)));
+    const ratingScore = offer.rating / Math.max(...allOffers.map(o => o.rating));
+    const etaScore = 1 / (offer.eta_minutes / Math.min(...allOffers.map(o => o.eta_minutes)));
+    
+    const valueScore = (priceScore * 0.4) + (ratingScore * 0.3) + (etaScore * 0.3);
+    const avgValueScore = allOffers.reduce((sum, o) => {
+      const pScore = 1 / (o.total_fare / Math.min(...allOffers.map(x => x.total_fare)));
+      const rScore = o.rating / Math.max(...allOffers.map(x => x.rating));
+      const eScore = 1 / (o.eta_minutes / Math.min(...allOffers.map(x => x.eta_minutes)));
+      return sum + ((pScore * 0.4) + (rScore * 0.3) + (eScore * 0.3));
+    }, 0) / allOffers.length;
+    
+    return valueScore > avgValueScore * 1.1; // Top 10% above average
+  };
 
   const handleAppRedirect = (offer: RideOffer) => {
     // Analytics tracking could be added here
@@ -155,6 +184,25 @@ const ResultsScreen = () => {
           </button>
         </div>
 
+      {/* Recommended Rides Section - At Top */}
+      {filteredOffers.length > 0 && (
+        <div style={{
+          background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+          color: 'white',
+          padding: '16px',
+          borderRadius: '12px',
+          margin: '16px 0',
+          textAlign: 'center'
+        }}>
+          <h2 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '700' }}>
+            ⭐ Recommended Rides
+          </h2>
+          <p style={{ margin: 0, fontSize: '14px', opacity: 0.9 }}>
+            Best value rides based on price, rating & ETA
+          </p>
+        </div>
+      )}
+
       {/* Trivago-style Comparison Summary */}
       <ComparisonSummary offers={allOffers} filteredOffers={filteredOffers} />
 
@@ -175,11 +223,13 @@ const ResultsScreen = () => {
         </div>
       ) : (
         <div>
-          {filteredOffers.map((offer) => (
+          {filteredOffers.map((offer, index) => (
             <RideCard 
               key={offer.id} 
               offer={offer} 
               onAppRedirect={handleAppRedirect}
+              isRecommended={isRecommendedRide(offer)}
+              isTopChoice={index === 0}
             />
           ))}
         </div>

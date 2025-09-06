@@ -83,72 +83,109 @@ const SearchScreen = () => {
 
   return (
     <AppLayout title="CABA">
-      <div className="screen">
-        {/* Trivago-style banner */}
-        <TrivagoBanner />
+      <div className="screen" style={{ paddingBottom: '20px' }}>
+        {/* Find a Ride - Priority Section at Top */}
+        <div style={{
+          background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+          color: 'white',
+          padding: '20px 16px',
+          borderRadius: '12px',
+          margin: '16px 0',
+          position: 'sticky',
+          top: '60px',
+          zIndex: 100
+        }}>
+          <h1 style={{ 
+            margin: '0 0 16px 0', 
+            fontSize: '24px', 
+            fontWeight: '700',
+            textAlign: 'center'
+          }}>
+            🚗 Find Your Ride
+          </h1>
 
-        <div className="screen-header">
-          <h1 className="screen-title">Find a Ride</h1>
+          <div style={{ position: 'relative', marginBottom: '16px' }}>
+            <LocationInput
+              label="📍 From"
+              placeholder="Enter pickup location"
+              value={pickup}
+              onChange={handlePickupChange}
+              showCurrentLocation={true}
+            />
+            <button
+              type="button"
+              onClick={() => handlePinLocation('pickup')}
+              style={{
+                position: 'absolute',
+                right: '8px',
+                top: '32px',
+                background: 'rgba(255,255,255,0.2)',
+                color: 'white',
+                border: '1px solid rgba(255,255,255,0.3)',
+                borderRadius: '6px',
+                padding: '6px 10px',
+                fontSize: '11px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                zIndex: 10
+              }}
+            >
+              📍 Pin
+            </button>
+          </div>
+
+          <div style={{ position: 'relative', marginBottom: '20px' }}>
+            <LocationInput
+              label="🎯 To (Optional)"
+              placeholder="Where to?"
+              value={destination}
+              onChange={handleDestinationChange}
+            />
+            <button
+              type="button"
+              onClick={() => handlePinLocation('destination')}
+              style={{
+                position: 'absolute',
+                right: '8px',
+                top: '32px',
+                background: 'rgba(255,255,255,0.2)',
+                color: 'white',
+                border: '1px solid rgba(255,255,255,0.3)',
+                borderRadius: '6px',
+                padding: '6px 10px',
+                fontSize: '11px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                zIndex: 10
+              }}
+            >
+              📍 Pin
+            </button>
+          </div>
+
+          <button 
+            className="btn"
+            onClick={handleSearch}
+            disabled={loading}
+            style={{ 
+              width: '100%', 
+              background: 'white',
+              color: '#1e3c72',
+              border: 'none',
+              padding: '14px',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: '700',
+              marginTop: '8px'
+            }}
+          >
+            {loading ? (
+              <div className="spinner" style={{ width: '20px', height: '20px' }}></div>
+            ) : (
+              '🔍 Search Rides Now'
+            )}
+          </button>
         </div>
-
-      <div style={{ position: 'relative' }}>
-        <LocationInput
-          label="Pickup Location"
-          placeholder="Enter pickup location"
-          value={pickup}
-          onChange={handlePickupChange}
-          showCurrentLocation={true}
-        />
-        <button
-          type="button"
-          onClick={() => handlePinLocation('pickup')}
-          style={{
-            position: 'absolute',
-            right: '8px',
-            top: '32px',
-            background: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            padding: '8px 12px',
-            fontSize: '12px',
-            fontWeight: '500',
-            cursor: 'pointer',
-            zIndex: 10
-          }}
-        >
-          📍 Pin Location
-        </button>
-      </div>
-
-      <div style={{ position: 'relative' }}>
-        <LocationInput
-          label="Destination (Optional)"
-          placeholder="Where to?"
-          value={destination}
-          onChange={handleDestinationChange}
-        />
-        <button
-          type="button"
-          onClick={() => handlePinLocation('destination')}
-          style={{
-            position: 'absolute',
-            right: '8px',
-            top: '32px',
-            background: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            padding: '8px 12px',
-            fontSize: '12px',
-            fontWeight: '500',
-            cursor: 'pointer',
-            zIndex: 10
-          }}
-        >
-          📍 Pin Location
-        </button>
-      </div>
 
       {showMap && (
         <div style={{
@@ -205,25 +242,18 @@ const SearchScreen = () => {
         </div>
       )}
 
-      <button 
-        className="btn btn-primary"
-        onClick={handleSearch}
-        disabled={loading}
-        style={{ width: '100%', marginTop: '20px' }}
-      >
-        {loading ? (
-          <div className="spinner" style={{ width: '20px', height: '20px' }}></div>
-        ) : (
-          'Search Rides'
-        )}
-      </button>
+        {/* Additional Features Section */}
+        <div style={{ margin: '24px 0' }}>
+          <div style={{ marginBottom: '20px', padding: '16px', background: '#e8f4f8', borderRadius: '12px' }}>
+            <h3 style={{ margin: '0 0 8px 0', color: '#1e3c72', fontSize: '16px' }}>📞 Need help? Call us!</h3>
+            <p style={{ margin: 0, fontSize: '14px', color: '#495057' }}>Call <strong>+91-XXXX-XXXX</strong> to book a ride via phone</p>
+          </div>
 
-      <div style={{ marginTop: '40px', padding: '20px', background: '#f8f9fa', borderRadius: '12px' }}>
-        <h3>📞 Need help? Call us!</h3>
-        <p>Call <strong>+91-XXXX-XXXX</strong> to book a ride via phone</p>
-      </div>
+          {/* Trivago-style banner - moved down */}
+          <TrivagoBanner />
+        </div>
 
-        {/* Three-step process */}
+        {/* Three-step process - moved to bottom */}
         <ThreeStepProcess />
       </div>
     </AppLayout>

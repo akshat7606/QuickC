@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { locationService } from '../services/locationService';
 import type { LocationSuggestion } from '../services/locationService';
+import { useKeyboardAdjustment } from '../hooks/useKeyboardAdjustment';
 
 interface LocationInputProps {
   label: string;
@@ -16,6 +17,7 @@ const LocationInput = ({ label, placeholder, value, onChange, showCurrentLocatio
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+  const { isKeyboardOpen, viewportHeight } = useKeyboardAdjustment();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -123,7 +125,7 @@ const LocationInput = ({ label, placeholder, value, onChange, showCurrentLocatio
             borderRadius: '8px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             zIndex: 1000,
-            maxHeight: '300px',
+            maxHeight: isKeyboardOpen ? '200px' : '300px', // Smaller when keyboard is open
             overflowY: 'auto'
           }}
         >

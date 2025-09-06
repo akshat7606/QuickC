@@ -3,9 +3,11 @@ import type { RideOffer } from '../types/rides';
 interface RideCardProps {
   offer: RideOffer;
   onAppRedirect: (offer: RideOffer) => void;
+  isRecommended?: boolean;
+  isTopChoice?: boolean;
 }
 
-const RideCard = ({ offer, onAppRedirect }: RideCardProps) => {
+const RideCard = ({ offer, onAppRedirect, isRecommended = false, isTopChoice = false }: RideCardProps) => {
   const handleRedirect = (e: React.MouseEvent) => {
     e.preventDefault();
     onAppRedirect(offer);
@@ -36,7 +38,8 @@ const RideCard = ({ offer, onAppRedirect }: RideCardProps) => {
         marginBottom: '12px',
         cursor: 'pointer',
         transition: 'transform 0.2s, box-shadow 0.2s',
-        position: 'relative'
+        position: 'relative',
+        border: isRecommended ? '2px solid #28a745' : isTopChoice ? '2px solid #007bff' : '1px solid #e0e0e0'
       }}
       onClick={handleRedirect}
       onMouseEnter={(e) => {
@@ -48,6 +51,38 @@ const RideCard = ({ offer, onAppRedirect }: RideCardProps) => {
         (e.target as HTMLElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
       }}
     >
+      {isRecommended && (
+        <div style={{
+          position: 'absolute',
+          top: '-1px',
+          right: '16px',
+          background: '#28a745',
+          color: 'white',
+          padding: '4px 12px',
+          borderRadius: '0 0 8px 8px',
+          fontSize: '11px',
+          fontWeight: '700',
+          zIndex: 10
+        }}>
+          ⭐ RECOMMENDED
+        </div>
+      )}
+      {isTopChoice && !isRecommended && (
+        <div style={{
+          position: 'absolute',
+          top: '-1px',
+          right: '16px',
+          background: '#007bff',
+          color: 'white',
+          padding: '4px 12px',
+          borderRadius: '0 0 8px 8px',
+          fontSize: '11px',
+          fontWeight: '700',
+          zIndex: 10
+        }}>
+          🏆 BEST CHOICE
+        </div>
+      )}
       {/* Provider Header */}
       <div style={{
         display: 'flex',
