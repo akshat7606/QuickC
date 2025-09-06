@@ -1,0 +1,92 @@
+Cab Aggregator App - Full Development Design Document
+
+1. Project Summary
+Single mobile app that aggregates nearby ride options (Uber, Ola, Rapido, etc.), displays normalized ETAs, fares and ride types, ranks them, and lets users deep-link to provider apps or complete booking in-app where partners allow.
+
+2. Product Requirements (MVP scope)
+Core functional requirements: location detection, pickup/drop search, parallel provider API fan-out, normalized offers, sort/filter, deep-links, clickout tracking, persistent prefs.
+Nice-to-have: in-app booking, price predictions, alerts, corporate accounts, featured placements.
+
+3. User Personas & Stories
+Personas: commuter, traveler, corporate power-user.
+Stories: search for rides, sort by cheapest/fastest, click provider deeplink, save Home/Work, consent location.
+
+4. UX / Information Architecture
+Screens: Home (search), Search Results (map + list), Provider Detail modal, Saved, Profile, Empty/Error states.
+Navigation: top profile, possible bottom nav.
+Key UI: provider cards with price, ETA, capacity, surge badges, deeplink button.
+
+5. Visual Design & Branding
+Palette: Deep Blue, Teal, Charcoal, Gray, Red, Green.
+Typography: Inter/Roboto.
+Design tokens: spacing, radius 8px.
+Accessibility: contrast, tap targets.
+
+6. API Design
+Endpoints:
+- POST /v1/search (pickup/drop, prefs) → offers with price, eta, deeplink
+- POST /v1/clickout (session/offer/partner)
+- GET /v1/partner/health
+- POST /v1/webhook/booking (optional)
+Authentication via API key; JSON over HTTPS.
+
+7. Partner Integration
+1. Deep-link only MVP (Uber, Ola, Rapido links).
+2. Affiliate/Partner API (server-side API calls).
+3. Full booking API (OAuth user login + bookings).
+
+8. Normalization
+Map ride types into categories: bike, economy, sedan, premium, XL, auto.
+Normalize price: base, distance, time, fees, surge.
+Normalize ETA to eta_seconds and optional eta_range.
+
+9. Ranking Algorithm
+Score = weighted sum of price_norm, eta_norm, reliability, pref_match minus surge_penalty.
+Initial weights: price=0.4, eta=0.3, rel=0.2, pref=0.1, surge=0.15.
+
+10. Caching & Performance
+Use Redis TTL cache per search. Fan-out to providers with parallel calls + 600ms timeout.
+UI shows partial results progressively. Circuit breaker for failing providers.
+
+11. Data Model
+Tables: users, search_sessions, partner_offers, clickouts, partners_health, bookings, events.
+Use Postgres (RDS/Cloud SQL). JSONB for raw payloads.
+
+12. Security & Compliance
+TLS, API key, partner secrets in vault. No password storage.
+OAuth tokens encrypted. PCI-DSS if payments later.
+Privacy: GDPR/DPDP compliance. WAF, rate limiting.
+
+13. Monitoring & Observability
+Logs in JSON, metrics in Prometheus/Grafana, OpenTelemetry tracing.
+Alerts: partner health, latency spikes, conversion drop.
+
+14. Testing Strategy
+Unit tests, contract tests, integration tests with fake providers.
+Load tests, Flutter widget tests, pen tests.
+
+15. Deployment & Infra
+AWS/GCP infra: API Gateway → container backend (Fargate/Cloud Run).
+Postgres, Redis, S3/GCS. CI/CD via GitHub Actions.
+Play Store/App Store distribution. Feature flags.
+
+16. Analytics & KPIs
+Track: search_started, offer_received, results_rendered, offer_clicked, booking_confirmed.
+KPIs: search→clickout conversion, booking conversion, latency, offers/session, revenue/search.
+
+17. Monetization
+CPC (clicks), CPA (commissions), featured listings, subscriptions.
+
+18. Legal & Partner Onboarding
+Agreements, API keys, referral tracking, logo guidelines, SLAs.
+Internal: privacy policy, ToS, consent flows.
+
+19. Delivery Phases
+Phase A: Design & scaffold (Figma, API spec, mocks).
+Phase B: Core backend + mocked providers.
+Phase C: Mobile app (Flutter).
+Phase D: Partner integrations.
+Phase E: In-app booking, monetization.
+
+20. Acceptance Criteria
+Search returns 2+ providers, results show price+ETA, deep-link works, clickouts tracked, latency below threshold.
