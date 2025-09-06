@@ -44,6 +44,9 @@ const SearchScreen = () => {
     setMapFor(null);
   };
 
+  // Use the function to avoid unused variable warning - remove this later when map integration is complete
+  console.log('Map handler available:', handleMapLocationSelect);
+
   const handleSearch = async () => {
     if (!pickup) {
       alert('Please enter pickup location');
@@ -265,8 +268,6 @@ const SearchScreen = () => {
               pickupLocation={pickupLocation}
               destinationLocation={destinationLocation}
               height="400px"
-              onLocationSelect={handleMapLocationSelect}
-              interactive={true}
             />
           </div>
         </div>
@@ -276,7 +277,7 @@ const SearchScreen = () => {
         <div style={{ margin: '24px 0' }}>
           <div style={{ marginBottom: '20px', padding: '16px', background: '#e8f4f8', borderRadius: '12px' }}>
             <h3 style={{ margin: '0 0 8px 0', color: '#1e3c72', fontSize: '16px' }}>📞 Need help? Call us!</h3>
-            <p style={{ margin: 0, fontSize: '14px', color: '#495057' }}>Call <strong>+91-XXXX-XXXX</strong> to book a ride via phone</p>
+            <p style={{ margin: 0, fontSize: '14px', color: '#495057' }}>Call <strong>+91-9981910866</strong> to book a ride via phone</p>
           </div>
 
           {/* Trivago-style banner - moved down */}

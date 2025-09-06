@@ -1,10 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import SearchScreen from './components/SearchScreen';
 import ResultsScreen from './components/ResultsScreen';
-import BookingScreen from './components/BookingScreen';
 import HistoryScreen from './components/HistoryScreen';
 import ProfileScreen from './components/ProfileScreen';
-import Navigation from './components/Navigation';
+import MoreScreen from './components/MoreScreen';
 import './App.css';
 
 function App() {
@@ -16,11 +15,10 @@ function App() {
             <Route path="/" element={<Navigate to="/search" replace />} />
             <Route path="/search" element={<SearchScreen />} />
             <Route path="/results" element={<ResultsScreen />} />
-            <Route path="/booking" element={<BookingScreen />} />
             <Route path="/history" element={<HistoryScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />
+            <Route path="/more" element={<MoreScreen />} />
           </Routes>
-          <Navigation />
         </div>
       </div>
     </Router>

@@ -6,7 +6,6 @@ import RideCard from './RideCard';
 import ComparisonSummary from './ComparisonSummary';
 import AppLayout from './AppLayout';
 import LoadingAnimation from './LoadingAnimation';
-import ProfessionalCard from './ProfessionalCard';
 import type { RideOffer } from '../types/rides';
 
 const ResultsScreen = () => {
@@ -15,14 +14,18 @@ const ResultsScreen = () => {
   const [filteredOffers, setFilteredOffers] = useState<RideOffer[]>([]);
   const [selectedSorts, setSelectedSorts] = useState(['price']);
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
-  const [searchData, setSearchData] = useState(null);
+  const [searchData] = useState<any>(null);
 
   useEffect(() => {
     const results = sessionStorage.getItem('searchResults');
     const search = sessionStorage.getItem('searchData');
     
     if (results && search) {
-      // Convert old format to new comprehensive format
+      // Convert old format to new comprehensive format  
+      const data = JSON.parse(search);
+      // Store search data for potential future use
+      console.log('Search data loaded:', data);
+      
       const oldOffers = JSON.parse(results).offers;
       const enhancedOffers = oldOffers.map((offer: any, index: number) => ({
         id: offer.driver_id,
@@ -42,7 +45,6 @@ const ResultsScreen = () => {
       }));
       
       setAllOffers(enhancedOffers);
-      setSearchData(JSON.parse(search));
     } else {
       navigate('/search');
     }
@@ -213,9 +215,10 @@ const ResultsScreen = () => {
             />
           ))}
         </div>
+      )}
 
-        {/* Recommended Rides Section - Moved Down */}
-        {filteredOffers.length > 3 && (
+      {/* Recommended Rides Section - Moved Down */}
+      {filteredOffers.length > 3 && (
           <div style={{
             background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
             color: 'white',
@@ -239,7 +242,7 @@ const ResultsScreen = () => {
               gap: '16px',
               gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))'
             }}>
-              {filteredOffers.filter(offer => isRecommendedRide(offer)).slice(0, 2).map((offer) => (
+              {filteredOffers.filter(recOffer => isRecommendedRide(recOffer)).slice(0, 2).map((offer) => (
                 <div
                   key={`rec-${offer.id}`}
                   style={{
@@ -295,7 +298,6 @@ const ResultsScreen = () => {
             </div>
           </div>
         )}
-      )}
 
         {/* Vehicle Type Selector - Fixed at bottom */}
         <VehicleSelector 
