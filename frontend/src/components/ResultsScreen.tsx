@@ -10,7 +10,7 @@ const ResultsScreen = () => {
   const navigate = useNavigate();
   const [allOffers, setAllOffers] = useState<RideOffer[]>([]);
   const [filteredOffers, setFilteredOffers] = useState<RideOffer[]>([]);
-  const [selectedSort, setSelectedSort] = useState('price');
+  const [selectedSorts, setSelectedSorts] = useState(['price']);
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
   const [searchData, setSearchData] = useState(null);
 
@@ -54,24 +54,34 @@ const ResultsScreen = () => {
       filtered = filtered.filter(offer => offer.vehicle_type === selectedVehicle);
     }
     
-    // Sort offers
-    filtered.sort((a, b) => {
-      switch (selectedSort) {
-        case 'price':
-          return a.total_fare - b.total_fare;
-        case 'distance':
-          return a.distance_km - b.distance_km;
-        case 'eta':
-          return a.eta_minutes - b.eta_minutes;
-        case 'rating':
-          return b.rating - a.rating;
-        default:
-          return 0;
-      }
-    });
+    // Sort offers by multiple criteria
+    if (selectedSorts.length > 0) {
+      filtered.sort((a, b) => {
+        // Apply each sort in order, with later sorts as tiebreakers
+        for (const sortType of selectedSorts) {
+          let comparison = 0;
+          switch (sortType) {
+            case 'price':
+              comparison = a.total_fare - b.total_fare;
+              break;
+            case 'distance':
+              comparison = a.distance_km - b.distance_km;
+              break;
+            case 'eta':
+              comparison = a.eta_minutes - b.eta_minutes;
+              break;
+            case 'rating':
+              comparison = b.rating - a.rating;
+              break;
+          }
+          if (comparison !== 0) return comparison;
+        }
+        return 0;
+      });
+    }
     
     setFilteredOffers(filtered);
-  }, [allOffers, selectedSort, selectedVehicle]);
+  }, [allOffers, selectedSorts, selectedVehicle]);
 
   const handleAppRedirect = (offer: RideOffer) => {
     // Analytics tracking could be added here
@@ -106,14 +116,26 @@ const ResultsScreen = () => {
   };
 
   const getDeepLink = (provider: string, offer: any): string => {
+    // Real deep links for ride-hailing apps
     const deepLinks: { [key: string]: string } = {
-      'Uber': 'uber://',
-      'Ola': 'ola://',
-      'Rapido': 'rapido://',
-      'BluSmart': 'https://blu-smart.com',
-      'Namma Yatri': 'nammayatri://'
+      'Uber': 'https://m.uber.com/ul/',
+      'Ola': 'https://book.olacabs.com/',
+      'Rapido': 'https://rapido.bike/ride',
+      'BluSmart': 'https://blu-smart.com/book',
+      'Namma Yatri': 'https://nammayatri.in/book'
     };
-    return deepLinks[provider] || '#';
+    
+    // If the app is installed, try app-specific URLs
+    const appSchemes: { [key: string]: string } = {
+      'Uber': 'uber://pickup',
+      'Ola': 'ola://book',
+      'Rapido': 'rapido://ride',
+      'BluSmart': 'blusmart://book',
+      'Namma Yatri': 'nammayatri://book'
+    };
+
+    // Return app scheme if available, otherwise web link
+    return appSchemes[provider] || deepLinks[provider] || '#';
   };
 
   return (
@@ -133,7 +155,7 @@ const ResultsScreen = () => {
       <ComparisonSummary offers={allOffers} filteredOffers={filteredOffers} />
 
       {/* Sort Options */}
-      <SortOptions selectedSort={selectedSort} onSortChange={setSelectedSort} />
+      <SortOptions selectedSorts={selectedSorts} onSortChange={setSelectedSorts} />
 
       {/* Ride Results */}
       {allOffers.length === 0 ? (
