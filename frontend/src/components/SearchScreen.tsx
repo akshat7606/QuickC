@@ -1,11 +1,26 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LocationInput from './LocationInput';
+import LocationMap from './LocationMap';
+import { LocationSuggestion } from '../services/locationService';
 
 const SearchScreen = () => {
   const navigate = useNavigate();
   const [pickup, setPickup] = useState('');
   const [destination, setDestination] = useState('');
+  const [pickupLocation, setPickupLocation] = useState<LocationSuggestion | undefined>();
+  const [destinationLocation, setDestinationLocation] = useState<LocationSuggestion | undefined>();
   const [loading, setLoading] = useState(false);
+
+  const handlePickupChange = (value: string, location?: LocationSuggestion) => {
+    setPickup(value);
+    setPickupLocation(location);
+  };
+
+  const handleDestinationChange = (value: string, location?: LocationSuggestion) => {
+    setDestination(value);
+    setDestinationLocation(location);
+  };
 
   const handleSearch = async () => {
     if (!pickup) {
@@ -15,13 +30,13 @@ const SearchScreen = () => {
 
     setLoading(true);
     try {
-      // Mock coordinates for demo
+      // Use actual coordinates if available, otherwise use defaults
       const searchData = {
-        pickup_lat: 28.6139,
-        pickup_lng: 77.2090,
+        pickup_lat: pickupLocation?.lat || 28.6139,
+        pickup_lng: pickupLocation?.lng || 77.2090,
         pickup_address: pickup,
-        drop_lat: 28.5355,
-        drop_lng: 77.3910,
+        drop_lat: destinationLocation?.lat || 28.5355,
+        drop_lng: destinationLocation?.lng || 77.3910,
         drop_address: destination
       };
 
@@ -50,27 +65,28 @@ const SearchScreen = () => {
         <h1 className="screen-title">Find a Ride</h1>
       </div>
 
-      <div className="form-group">
-        <label className="form-label">Pickup Location</label>
-        <input
-          type="text"
-          className="form-input"
-          placeholder="Enter pickup location"
-          value={pickup}
-          onChange={(e) => setPickup(e.target.value)}
-        />
-      </div>
+      <LocationInput
+        label="Pickup Location"
+        placeholder="Enter pickup location"
+        value={pickup}
+        onChange={handlePickupChange}
+        showCurrentLocation={true}
+      />
 
-      <div className="form-group">
-        <label className="form-label">Destination (Optional)</label>
-        <input
-          type="text"
-          className="form-input"
-          placeholder="Where to?"
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
+      <LocationInput
+        label="Destination (Optional)"
+        placeholder="Where to?"
+        value={destination}
+        onChange={handleDestinationChange}
+      />
+
+      {(pickupLocation || destinationLocation) && (
+        <LocationMap
+          pickupLocation={pickupLocation}
+          destinationLocation={destinationLocation}
+          height="180px"
         />
-      </div>
+      )}
 
       <button 
         className="btn btn-primary"
