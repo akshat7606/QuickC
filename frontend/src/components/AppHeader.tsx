@@ -10,7 +10,7 @@ interface AppHeaderProps {
 }
 
 const AppHeader = ({ 
-  title = "CABA", 
+  title = "QuickC", 
   showProfile = true, 
   showMenu = true,
   onProfileClick,

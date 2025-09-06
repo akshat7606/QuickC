@@ -99,7 +99,7 @@ const SearchScreen = () => {
   };
 
   return (
-    <AppLayout title="CABA">
+    <AppLayout title="QuickC">
       <OfflineNotification 
         isVisible={showOfflineNotification}
         onDismiss={dismissOfflineNotification}
@@ -128,7 +128,7 @@ const SearchScreen = () => {
               fontWeight: '300',
               letterSpacing: '0.5px'
             }}>
-              Compare & Book Rides
+              Compare. Click. Commute.
             </h1>
             <p style={{ 
               margin: 0, 

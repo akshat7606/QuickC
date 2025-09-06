@@ -5,13 +5,13 @@ const MoreScreen = () => {
   const handleInfoClick = (action: string) => {
     switch (action) {
       case 'about':
-        alert('CABA (Compare & Book Rides) is a comprehensive platform that aggregates rides from multiple providers like Uber, Ola, Rapido, and more. We help you find the best ride for your needs!');
+        alert('QuickC (Compare. Click. Commute.) is a comprehensive platform that aggregates rides from multiple providers like Uber, Ola, Rapido, and more. We help you find the best ride for your needs!');
         break;
       case 'how-it-works':
         alert('1. Enter your pickup and destination\n2. We search all major ride providers\n3. Compare prices, ETAs, and ratings\n4. Choose your preferred ride\n5. Book directly with the provider');
         break;
       case 'pricing':
-        alert('CABA is free to use! We don\'t charge any booking fees. You pay the ride provider directly at their standard rates.');
+        alert('QuickC is free to use! We don\'t charge any booking fees. You pay the ride provider directly at their standard rates.');
         break;
       case 'safety':
         alert('Your safety is our priority. All ride providers on our platform maintain their own safety standards and insurance. For emergencies, contact your ride provider directly or call local authorities.');
@@ -27,10 +27,10 @@ const MoreScreen = () => {
         window.location.href = 'tel:+919981910866';
         break;
       case 'email':
-        window.location.href = 'mailto:support@caba.app?subject=CABA Support Request';
+        window.location.href = 'mailto:support@quickc.app?subject=QuickC Support Request';
         break;
       case 'website':
-        window.open('https://www.caba.app', '_blank');
+        window.open('https://www.quickc.app', '_blank');
         break;
       default:
         break;
@@ -66,14 +66,14 @@ const MoreScreen = () => {
           marginBottom: '24px',
           textAlign: 'center'
         }}>
-          <h2 style={{ margin: '0 0 8px 0', fontSize: '24px' }}>CABA</h2>
-          <p style={{ margin: 0, opacity: 0.9, fontSize: '14px' }}>Compare & Book Rides</p>
+          <h2 style={{ margin: '0 0 8px 0', fontSize: '24px' }}>QuickC</h2>
+          <p style={{ margin: 0, opacity: 0.9, fontSize: '14px' }}>Compare. Click. Commute.</p>
         </div>
 
         {/* App Information */}
         <div style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', marginBottom: '16px' }}>
           {[
-            { icon: '📱', title: 'About CABA', subtitle: 'Learn more about our platform', action: 'about' },
+            { icon: '📱', title: 'About QuickC', subtitle: 'Learn more about our platform', action: 'about' },
             { icon: '🎯', title: 'How it Works', subtitle: 'Compare rides across platforms', action: 'how-it-works' },
             { icon: '💳', title: 'Pricing', subtitle: 'Transparent pricing model', action: 'pricing' },
             { icon: '🛡️', title: 'Safety & Security', subtitle: 'Your safety is our priority', action: 'safety' }
@@ -149,7 +149,7 @@ const MoreScreen = () => {
                 ✉️ Email Support
               </div>
               <div style={{ color: '#666', fontSize: '14px' }}>
-                support@caba.app
+                support@quickc.app
               </div>
             </button>
 
@@ -169,7 +169,7 @@ const MoreScreen = () => {
                 🌐 Website
               </div>
               <div style={{ color: '#666', fontSize: '14px' }}>
-                www.caba.app
+                www.quickc.app
               </div>
             </button>
           </div>
@@ -216,7 +216,7 @@ const MoreScreen = () => {
           color: '#666',
           fontSize: '14px'
         }}>
-          <p>© 2024 CABA - Compare & Book Rides</p>
+          <p>© 2024 QuickC - Compare. Click. Commute.</p>
           <p>Version 1.0.0</p>
         </div>
       </div>

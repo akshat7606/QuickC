@@ -29,7 +29,7 @@ const ThreeStepProcess = () => {
         fontWeight: '700',
         marginBottom: '24px'
       }}>
-        How CABA Works
+        How QuickC Works
       </h3>
       
       <div style={{
