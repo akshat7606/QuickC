@@ -1,4 +1,5 @@
-import { VEHICLE_TYPES, VehicleType } from '../types/rides';
+import { VEHICLE_TYPES } from '../types/rides';
+import type { VehicleType } from '../types/rides';
 
 interface VehicleSelectorProps {
   selectedVehicle: string | null;

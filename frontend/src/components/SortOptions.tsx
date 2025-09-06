@@ -1,4 +1,5 @@
-import { SORT_OPTIONS, SortOption } from '../types/rides';
+import { SORT_OPTIONS } from '../types/rides';
+import type { SortOption } from '../types/rides';
 
 interface SortOptionsProps {
   selectedSort: string;
