@@ -65,10 +65,18 @@ const LocationInput = ({ label, placeholder, value, onChange, showCurrentLocatio
     try {
       const userLocation = await locationService.getCurrentLocation();
       const locationText = userLocation.address || `Current Location (${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)})`;
-      onChange(locationText);
+      const locationData: LocationSuggestion = {
+        name: 'Current Location',
+        address: locationText,
+        lat: userLocation.latitude,
+        lng: userLocation.longitude,
+        type: 'current'
+      };
+      onChange(locationText, locationData);
       setShowSuggestions(false);
     } catch (error) {
-      alert('Could not get your current location. Please ensure location access is enabled.');
+      console.error('Location error:', error);
+      alert('Could not get your current location. Please ensure location access is enabled in your browser settings.');
     }
     setIsLoadingLocation(false);
   };

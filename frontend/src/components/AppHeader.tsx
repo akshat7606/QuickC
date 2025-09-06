@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface AppHeaderProps {
   title?: string;
@@ -16,6 +17,33 @@ const AppHeader = ({
   onMenuClick 
 }: AppHeaderProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
+
+  const handleHeaderAction = (action: string) => {
+    setShowDropdown(false);
+    switch (action) {
+      case 'profile':
+        navigate('/profile');
+        break;
+      case 'history':
+        navigate('/history');
+        break;
+      case 'settings':
+        alert('Settings coming soon! Currently using default app preferences.');
+        break;
+      case 'logout':
+        if (confirm('Are you sure you want to logout?')) {
+          localStorage.clear();
+          sessionStorage.clear();
+          navigate('/search');
+          alert('Logged out successfully!');
+        }
+        break;
+      default:
+        if (onProfileClick) onProfileClick();
+        break;
+    }
+  };
 
   return (
     <header style={{
@@ -98,7 +126,7 @@ const AppHeader = ({
               </div>
               <div style={{ padding: '8px 0' }}>
                 <button
-                  onClick={onProfileClick}
+                  onClick={() => handleHeaderAction('profile')}
                   style={{
                     width: '100%',
                     background: 'none',
@@ -115,6 +143,7 @@ const AppHeader = ({
                   👤 View Profile
                 </button>
                 <button
+                  onClick={() => handleHeaderAction('history')}
                   style={{
                     width: '100%',
                     background: 'none',
@@ -131,6 +160,7 @@ const AppHeader = ({
                   📋 Trip History
                 </button>
                 <button
+                  onClick={() => handleHeaderAction('settings')}
                   style={{
                     width: '100%',
                     background: 'none',
@@ -147,6 +177,7 @@ const AppHeader = ({
                   ⚙️ Settings
                 </button>
                 <button
+                  onClick={() => handleHeaderAction('logout')}
                   style={{
                     width: '100%',
                     background: 'none',
