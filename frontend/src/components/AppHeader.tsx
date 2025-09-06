@@ -1,20 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import quickcLogo from '../assets/quickc-logo.png';
 
 interface AppHeaderProps {
   title?: string;
   showProfile?: boolean;
-  showMenu?: boolean;
   onProfileClick?: () => void;
-  onMenuClick?: () => void;
 }
 
 const AppHeader = ({ 
   title = "QuickC", 
-  showProfile = true, 
-  showMenu = true,
-  onProfileClick,
-  onMenuClick 
+  showProfile = true,
+  onProfileClick
 }: AppHeaderProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
@@ -61,29 +58,35 @@ const AppHeader = ({
       zIndex: 1000,
       boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
     }}>
-      {/* Left side - Logo/Menu */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        {showMenu && (
-          <button
-            onClick={onMenuClick}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'white',
-              fontSize: '20px',
-              cursor: 'pointer',
-              padding: '8px'
-            }}
-          >
-            ☰
-          </button>
-        )}
+      {/* Left side - Logo */}
+      <div 
+        style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '12px',
+          cursor: 'pointer'
+        }}
+        onClick={() => navigate('/search')}
+      >
+        <img 
+          src={quickcLogo} 
+          alt="QuickC Logo" 
+          style={{
+            height: '36px',
+            width: 'auto',
+            borderRadius: '6px'
+          }}
+        />
         <div style={{
           fontSize: '20px',
           fontWeight: '700',
-          letterSpacing: '1px'
+          letterSpacing: '1px',
+          background: 'linear-gradient(45deg, #ffffff, #e0e6ed)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          textShadow: '0 1px 2px rgba(0,0,0,0.1)'
         }}>
-          🚗 {title}
+          {title}
         </div>
       </div>
 
