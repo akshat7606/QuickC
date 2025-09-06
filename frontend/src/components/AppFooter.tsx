@@ -13,13 +13,6 @@ const AppFooter = () => {
       active: location.pathname === '/search' || location.pathname === '/'
     },
     {
-      id: 'rides',
-      icon: '🚗',
-      label: 'Rides',
-      path: '/results',
-      active: location.pathname === '/results'
-    },
-    {
       id: 'history',
       icon: '📋',
       label: 'History',

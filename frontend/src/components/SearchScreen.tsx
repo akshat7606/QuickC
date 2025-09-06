@@ -5,7 +5,9 @@ import LocationMap from './LocationMap';
 import TrivagoBanner from './TrivagoBanner';
 import ThreeStepProcess from './ThreeStepProcess';
 import AppLayout from './AppLayout';
+import OfflineNotification from './OfflineNotification';
 import type { LocationSuggestion } from '../services/locationService';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
 const SearchScreen = () => {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ const SearchScreen = () => {
   const [loading, setLoading] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [mapFor, setMapFor] = useState<'pickup' | 'destination' | null>(null);
+  const { isOnline, showOfflineNotification, dismissOfflineNotification } = useNetworkStatus();
 
   const handlePickupChange = (value: string, location?: LocationSuggestion) => {
     setPickup(value);
@@ -53,6 +56,11 @@ const SearchScreen = () => {
       return;
     }
 
+    if (!isOnline) {
+      alert('No internet connection. Please use the IVR system to book your ride by calling +91-9981910866');
+      return;
+    }
+
     setLoading(true);
     try {
       // Use actual coordinates if available, otherwise use defaults
@@ -76,16 +84,28 @@ const SearchScreen = () => {
         sessionStorage.setItem('searchResults', JSON.stringify(results));
         sessionStorage.setItem('searchData', JSON.stringify(searchData));
         navigate('/results');
+      } else {
+        throw new Error('Search request failed');
       }
     } catch (error) {
       console.error('Search failed:', error);
-      alert('Search failed. Please try again.');
+      alert('Network error occurred. Please check your connection or use IVR booking: +91-9981910866');
     }
     setLoading(false);
   };
 
+  const handleCallIVR = () => {
+    window.location.href = 'tel:+919981910866';
+  };
+
   return (
     <AppLayout title="CABA">
+      <OfflineNotification 
+        isVisible={showOfflineNotification}
+        onDismiss={dismissOfflineNotification}
+        onCallIVR={handleCallIVR}
+      />
+      
       <div className="screen" style={{ paddingBottom: '20px' }}>
         {/* Find a Ride - Professional Section */}
         <div style={{
@@ -277,7 +297,26 @@ const SearchScreen = () => {
         <div style={{ margin: '24px 0' }}>
           <div style={{ marginBottom: '20px', padding: '16px', background: '#e8f4f8', borderRadius: '12px' }}>
             <h3 style={{ margin: '0 0 8px 0', color: '#1e3c72', fontSize: '16px' }}>📞 Need help? Call us!</h3>
-            <p style={{ margin: 0, fontSize: '14px', color: '#495057' }}>Call <strong>+91-9981910866</strong> to book a ride via phone</p>
+            <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#495057' }}>Book a ride via phone with our IVR system</p>
+            <button
+              onClick={handleCallIVR}
+              style={{
+                background: 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '12px 20px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: '0 3px 12px rgba(39,174,96,0.3)'
+              }}
+            >
+              📞 Call +91-9981910866
+            </button>
           </div>
 
           {/* Trivago-style banner - moved down */}
