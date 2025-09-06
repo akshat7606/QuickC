@@ -4,6 +4,7 @@ import SortOptions from './SortOptions';
 import VehicleSelector from './VehicleSelector';
 import RideCard from './RideCard';
 import ComparisonSummary from './ComparisonSummary';
+import AppLayout from './AppLayout';
 import type { RideOffer } from '../types/rides';
 
 const ResultsScreen = () => {
@@ -139,17 +140,20 @@ const ResultsScreen = () => {
   };
 
   return (
-    <div className="screen" style={{ paddingBottom: '160px' }}>
-      <div className="screen-header">
-        <button 
-          className="btn btn-secondary"
-          onClick={() => navigate('/search')}
-          style={{ padding: '8px 16px' }}
-        >
-          ← Back
-        </button>
-        <h1 className="screen-title">Compare Rides</h1>
-      </div>
+    <AppLayout title="Compare Rides">
+      <div className="screen" style={{ 
+        paddingBottom: '100px', // Space for vehicle selector
+        minHeight: 'calc(100vh - 140px)' // Full height minus header and footer
+      }}>
+        <div className="screen-header">
+          <button 
+            className="btn btn-secondary"
+            onClick={() => navigate('/search')}
+            style={{ padding: '8px 16px' }}
+          >
+            ← Back
+          </button>
+        </div>
 
       {/* Trivago-style Comparison Summary */}
       <ComparisonSummary offers={allOffers} filteredOffers={filteredOffers} />
@@ -181,12 +185,13 @@ const ResultsScreen = () => {
         </div>
       )}
 
-      {/* Vehicle Type Selector - Fixed at bottom */}
-      <VehicleSelector 
-        selectedVehicle={selectedVehicle} 
-        onVehicleSelect={setSelectedVehicle}
-      />
-    </div>
+        {/* Vehicle Type Selector - Fixed at bottom */}
+        <VehicleSelector 
+          selectedVehicle={selectedVehicle} 
+          onVehicleSelect={setSelectedVehicle}
+        />
+      </div>
+    </AppLayout>
   );
 };
 
