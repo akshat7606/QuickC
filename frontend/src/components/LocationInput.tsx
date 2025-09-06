@@ -37,27 +37,14 @@ const LocationInput = ({ label, placeholder, value, onChange, showCurrentLocatio
     const inputValue = e.target.value;
     onChange(inputValue);
     
-    if (inputValue.trim()) {
-      const locationSuggestions = locationService.searchLocations(inputValue);
-      setSuggestions(locationSuggestions);
-      setShowSuggestions(true);
-    } else {
-      const popularSuggestions = locationService.getPopularNearby();
-      setSuggestions(popularSuggestions);
-      setShowSuggestions(false);
-    }
+    // Show suggestions immediately like Uber does
+    const locationSuggestions = locationService.searchLocations(inputValue);
+    setSuggestions(locationSuggestions);
+    setShowSuggestions(true);
   };
 
   const handleInputFocus = () => {
-    if (!value.trim()) {
-      const popularSuggestions = locationService.getPopularNearby();
-      setSuggestions(popularSuggestions);
-    } else {
-      const locationSuggestions = locationService.searchLocations(value);
-      setSuggestions(locationSuggestions);
-    }
-    setShowSuggestions(true);
-  };
+    // Always show suggestions when focused, like Uber\n    const locationSuggestions = locationService.searchLocations(value);\n    setSuggestions(locationSuggestions);\n    setShowSuggestions(true);\n  };
 
   const handleSuggestionClick = (suggestion: LocationSuggestion) => {
     const formattedLocation = locationService.formatLocation(suggestion);
