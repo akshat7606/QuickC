@@ -1,4 +1,4 @@
-interface LocationSuggestion {
+export interface LocationSuggestion {
   id: string;
   name: string;
   description: string;
@@ -6,7 +6,7 @@ interface LocationSuggestion {
   lng: number;
 }
 
-interface UserLocation {
+export interface UserLocation {
   latitude: number;
   longitude: number;
   address?: string;
@@ -128,4 +128,3 @@ class LocationService {
 }
 
 export const locationService = new LocationService();
-export type { LocationSuggestion, UserLocation };

@@ -10,6 +10,7 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: [
       'd77d5454-5530-423e-b0b6-9dc9ba8366cd-00-2hvc8m3imn6go.spock.replit.dev',
+      'd77d5454-5530-423e-b0b6-9dc9ba8366cd-00-2hvc8m3imn6go.spock.repl.co',
       'localhost'
     ],
     hmr: {
