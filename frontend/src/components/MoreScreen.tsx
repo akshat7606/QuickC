@@ -1,8 +1,6 @@
-import { useNavigate } from 'react-router-dom';
 import AppLayout from './AppLayout';
 
 const MoreScreen = () => {
-  const navigate = useNavigate();
 
   const handleInfoClick = (action: string) => {
     switch (action) {

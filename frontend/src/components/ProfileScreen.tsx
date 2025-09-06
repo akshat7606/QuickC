@@ -122,7 +122,7 @@ const ProfileScreen = () => {
                 <div style={{ color: '#666', fontSize: '14px' }}>{item.subtitle}</div>
               </div>
               <div style={{ color: '#ccc', fontSize: '18px' }}>›</div>
-            </div>
+            </button>
           ))}
         </div>
 

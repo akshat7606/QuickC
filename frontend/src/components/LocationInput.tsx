@@ -17,7 +17,7 @@ const LocationInput = ({ label, placeholder, value, onChange, showCurrentLocatio
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
-  const { isKeyboardOpen, viewportHeight } = useKeyboardAdjustment();
+  const { isKeyboardOpen } = useKeyboardAdjustment();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -67,7 +67,6 @@ const LocationInput = ({ label, placeholder, value, onChange, showCurrentLocatio
       const locationText = userLocation.address || `Current Location (${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)})`;
       const locationData: LocationSuggestion = {
         name: 'Current Location',
-        address: locationText,
         lat: userLocation.latitude,
         lng: userLocation.longitude,
         type: 'current'
