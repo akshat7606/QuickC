@@ -5,7 +5,6 @@ import LocationMap from './LocationMap';
 import TrivagoBanner from './TrivagoBanner';
 import ThreeStepProcess from './ThreeStepProcess';
 import AppLayout from './AppLayout';
-import OfflineNotification from './OfflineNotification';
 import type { LocationSuggestion } from '../services/locationService';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
@@ -18,7 +17,7 @@ const SearchScreen = () => {
   const [loading, setLoading] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [mapFor, setMapFor] = useState<'pickup' | 'destination' | null>(null);
-  const { isOnline, showOfflineNotification, dismissOfflineNotification, retryConnection } = useNetworkStatus();
+  const { isOnline } = useNetworkStatus();
 
   const handlePickupChange = (value: string, location?: LocationSuggestion) => {
     setPickup(value);
@@ -100,12 +99,6 @@ const SearchScreen = () => {
 
   return (
     <AppLayout title="QuickC">
-      <OfflineNotification 
-        isVisible={showOfflineNotification}
-        onDismiss={dismissOfflineNotification}
-        onCallIVR={handleCallIVR}
-        onRetry={retryConnection}
-      />
       
       <div className="screen" style={{ paddingBottom: '20px' }}>
         {/* Find a Ride - Professional Section */}
