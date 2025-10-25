@@ -58,7 +58,7 @@ class Driver(Base):
 Base.metadata.create_all(bind=engine)
 
 # FastAPI app
-app = FastAPI(title="Universal Cab Aggregator API", version="1.0.0")
+app = FastAPI(title="QuickC API", version="1.0.0")
 
 # Pydantic models
 class SearchRequest(BaseModel):
@@ -141,7 +141,7 @@ def calculate_eta(distance_km: float = 5.0) -> int:
 
 @app.get("/")
 async def root():
-    return {"message": "Universal Cab Aggregator API", "status": "running"}
+    return {"message": "QuickC API", "status": "running"}
 
 @app.post("/v1/search", response_model=SearchResponse)
 async def search_rides(request: SearchRequest):
@@ -191,7 +191,7 @@ async def book_ride(request: BookRequest):
         driver_phone = "+919876543200"
         
         # Create booking
-        booking_id = f"UCA{int(datetime.now().timestamp())}"
+        booking_id = f"QuickC{int(datetime.now().timestamp())}"
         booking = Booking(
             booking_id=booking_id,
             phone=request.phone,
@@ -260,11 +260,11 @@ async def handle_ivr_booking(request: Request):
         response = VoiceResponse()
         
         # Welcome message
-        response.say("Welcome to Universal Cab Aggregator! Please hold while we book your ride.")
+        response.say("Welcome to QuickC! Please hold while we book your ride.")
         
         # For MVP, we'll create a simple booking
         db = next(get_db())
-        booking_id = f"UCA{int(datetime.now().timestamp())}"
+        booking_id = f"QuickC{int(datetime.now().timestamp())}"
         
         # Mock booking data for IVR
         booking = Booking(

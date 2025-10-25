@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.uca.app',
-  appName: 'UCA - Universal Cab Aggregator',
+  appId: 'com.QuickC.app',
+  appName: 'QuickC',
   webDir: 'frontend/dist',
   server: {
     androidScheme: 'https'

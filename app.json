@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "UCA - Universal Cab Aggregator",
-    "slug": "uca-cab-aggregator",
+    "name": "QuickC",
+    "slug": "QuickC-cab-aggregator",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,7 +16,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.uca.app",
+      "bundleIdentifier": "com.QuickC.app",
       "buildNumber": "1.0.0"
     },
     "android": {
@@ -24,7 +24,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1e3c72"
       },
-      "package": "com.uca.app",
+      "package": "com.QuickC.app",
       "versionCode": 1
     },
     "web": {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.uca.app">
+    package="com.QuickC.app">
 
     <application
         android:allowBackup="true"
@@ -14,7 +14,7 @@
         <activity
             android:exported="true"
             android:launchMode="singleTask"
-            android:name="com.uca.app.MainActivity"
+            android:name="com.QuickC.app.MainActivity"
             android:theme="@style/AppTheme.NoActionBarLaunch">
 
             <intent-filter>

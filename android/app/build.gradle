@@ -1,8 +1,8 @@
 android {
-    namespace "com.uca.app"
+    namespace "com.QuickC.app"
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.uca.app"
+        applicationId "com.QuickC.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

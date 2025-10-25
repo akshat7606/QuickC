@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# iOS Build Script for UCA Universal Cab Aggregator
+# iOS Build Script for QuickC
 # This script prepares the iOS app for App Store submission
 
-echo "🚀 Starting iOS build process for UCA..."
+echo "🚀 Starting iOS build process for QuickC..."
 
 # Check if running on macOS
 if [[ "$OSTYPE" != "darwin"* ]]; then

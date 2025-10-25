@@ -1,4 +1,4 @@
-# UCA App Store Deployment Checklist
+# QuickC App Store Deployment Checklist
 
 ## ✅ READY FOR SUBMISSION
 
@@ -54,7 +54,7 @@
 ## 📁 **Project Structure**
 
 ```
-UCA-App/
+QuickC-App/
 ├── main.py                     # Backend API
 ├── frontend/                   # React web app
 ├── assets/                     # App icons and images
@@ -124,4 +124,4 @@ The platform supports multiple revenue streams:
 
 ## 🎉 **Ready to Launch!**
 
-Your UCA Universal Cab Aggregator is completely ready for app store submission. All technical components are built, tested, and deployment-ready. The only remaining steps are platform-specific account setup and submission processes.
+Your QuickC is completely ready for app store submission. All technical components are built, tested, and deployment-ready. The only remaining steps are platform-specific account setup and submission processes.
