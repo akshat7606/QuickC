@@ -31,12 +31,20 @@ jobs:
         working-directory: frontend
         run: npm run build
 
-      - name: Copy index.html to 404.html (SPA routing)
+      - name: Prepare SPA files (404 fallback and disable Jekyll)
         working-directory: frontend
         run: |
+          # Ensure SPA routing works by providing a 404 fallback
           if [ -f dist/index.html ]; then
             cp dist/index.html dist/404.html
           fi
+          # Disable Jekyll processing on GitHub Pages which can 404 static files
+          touch dist/.nojekyll
+
+      - name: Debug: show dist contents
+        working-directory: frontend
+        run: |
+          echo "Dist contents:" && ls -la dist || true
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -46,4 +54,3 @@ jobs:
           publish_branch: gh-pages
           user_name: github-actions[bot]
           user_email: 41898282+github-actions[bot]@users.noreply.github.com
-
