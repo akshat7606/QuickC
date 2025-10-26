@@ -5,15 +5,25 @@ on:
     branches:
       - main
       - master
+      - Test
       - release/**
-      - 'refs/heads/**'
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,7 +39,9 @@ jobs:
 
       - name: Build frontend
         working-directory: frontend
-        run: npm run build
+        run: |
+          npm run build
+          echo "Build completed successfully"
 
       - name: Prepare SPA files (404 fallback and disable Jekyll)
         working-directory: frontend
@@ -37,20 +49,32 @@ jobs:
           # Ensure SPA routing works by providing a 404 fallback
           if [ -f dist/index.html ]; then
             cp dist/index.html dist/404.html
+            echo "Created 404.html for SPA routing"
           fi
           # Disable Jekyll processing on GitHub Pages which can 404 static files
           touch dist/.nojekyll
+          echo "Created .nojekyll file"
 
-      - name: Debug: show dist contents
+      - name: Debug - List build output
         working-directory: frontend
         run: |
-          echo "Dist contents:" && ls -la dist || true
+          echo "=== Dist directory contents ==="
+          ls -laR dist/
+          echo ""
+          echo "=== Checking for required files ==="
+          test -f dist/index.html && echo "✓ index.html exists" || echo "✗ index.html missing"
+          test -f dist/.nojekyll && echo "✓ .nojekyll exists" || echo "✗ .nojekyll missing"
+          test -f dist/404.html && echo "✓ 404.html exists" || echo "✗ 404.html missing"
+          test -d dist/assets && echo "✓ assets directory exists" || echo "✗ assets directory missing"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './frontend/dist'
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./frontend/dist
-          publish_branch: gh-pages
-          user_name: github-actions[bot]
-          user_email: 41898282+github-actions[bot]@users.noreply.github.com
+        id: deployment
+        uses: actions/deploy-pages@v4
