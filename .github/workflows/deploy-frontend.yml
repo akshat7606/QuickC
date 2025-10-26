@@ -41,7 +41,7 @@ jobs:
           # Disable Jekyll processing on GitHub Pages which can 404 static files
           touch dist/.nojekyll
 
-      - name: Debug: show dist contents
+      - Debug: show dist contents
         working-directory: frontend
         run: |
           echo "Dist contents:" && ls -la dist || true
