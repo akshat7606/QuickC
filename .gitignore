@@ -1,0 +1,28 @@
+# Node
+node_modules/
+frontend/node_modules/
+package-lock.json
+
+# Vite build
+/frontend/dist/
+dist/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Ignore local secrets
+.env
+
