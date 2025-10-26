@@ -1,6 +1,6 @@
 {
-  "name": "UCA - Universal Cab Aggregator",
-  "short_name": "UCA",
+  "name": "QuickC",
+  "short_name": "QuickC",
   "description": "Universal platform for booking rides from multiple providers",
   "start_url": "/",
   "display": "standalone",

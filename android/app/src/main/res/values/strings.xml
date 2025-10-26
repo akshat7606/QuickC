@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">UCA - Universal Cab Aggregator</string>
-    <string name="title_activity_main">UCA</string>
-    <string name="package_name">com.uca.app</string>
-    <string name="custom_url_scheme">com.uca.app</string>
+    <string name="app_name">QuickC</string>
+    <string name="title_activity_main">QuickC</string>
+    <string name="package_name">com.QuickC.app</string>
+    <string name="custom_url_scheme">com.QuickC.app</string>
 </resources>

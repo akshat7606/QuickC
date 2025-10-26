@@ -1,10 +1,10 @@
-UCA - Universal Cab Aggregator: Your All-in-One Ride Booking Solution
+QuickC: Your All-in-One Ride Booking Solution
 
 🚗 COMPARE • BOOK • RIDE
 
-Transform your daily commute with UCA, the smart way to book rides across India. Why use multiple apps when you can have everything in one place?
+Transform your daily commute with QuickC, the smart way to book rides across India. Why use multiple apps when you can have everything in one place?
 
-🔥 WHAT MAKES UCA SPECIAL?
+🔥 WHAT MAKES QuickC SPECIAL?
 
 🔍 INSTANT COMPARISON
 Compare rides from top providers like Uber, Ola, Rapido instantly. See real-time prices, arrival times, and vehicle options side by side.
@@ -50,13 +50,13 @@ Track all your bookings in one unified dashboard. Whether booked via app or phon
 
 🌍 ACCESSIBILITY FOR ALL
 
-UCA believes transportation should be accessible to everyone. That's why we offer both modern app-based booking and traditional phone booking - ensuring no one is left behind in the digital age.
+QuickC believes transportation should be accessible to everyone. That's why we offer both modern app-based booking and traditional phone booking - ensuring no one is left behind in the digital age.
 
 📞 PHONE BOOKING FEATURE
 
 Can't use the app? No problem! Call our dedicated hotline and book rides via voice. Our system automatically syncs with your app account for seamless tracking.
 
-💡 WHY CHOOSE UCA?
+💡 WHY CHOOSE QuickC?
 
 Instead of juggling multiple ride apps:
 • Save time with one-stop comparison
@@ -66,7 +66,7 @@ Instead of juggling multiple ride apps:
 
 🚀 JOIN THE REVOLUTION
 
-Over [X] users already trust UCA for their daily rides. Join India's fastest-growing ride aggregation platform and never overpay for a ride again.
+Over [X] users already trust QuickC for their daily rides. Join India's fastest-growing ride aggregation platform and never overpay for a ride again.
 
 DOWNLOAD NOW and get your first ride comparison FREE!
 
@@ -79,9 +79,9 @@ DOWNLOAD NOW and get your first ride comparison FREE!
 • Location services for accurate pickup
 
 🔗 Connect With Us:
-Website: uca.app
-Support: support@uca.app
-Privacy Policy: uca.app/privacy
-Terms: uca.app/terms
+Website: QuickC.app
+Support: support@QuickC.app
+Privacy Policy: QuickC.app/privacy
+Terms: QuickC.app/terms
 
 Made in India 🇮🇳 for Indian commuters

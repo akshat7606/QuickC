@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Android Build Script for UCA Universal Cab Aggregator
+# Android Build Script for QuickC
 # This script prepares the Android app for Play Store submission
 
-echo "🚀 Starting Android build process for UCA..."
+echo "🚀 Starting Android build process for QuickC..."
 
 # Check for required tools
 command -v npx >/dev/null 2>&1 || { echo "❌ Node.js/npm is required but not installed. Aborting." >&2; exit 1; }
@@ -40,7 +40,7 @@ cp assets/icons/icon.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 # Generate release keystore (if it doesn't exist)
 if [ ! -f "android/app/release-key.keystore" ]; then
     echo "🔐 Generating release keystore..."
-    keytool -genkey -v -keystore android/app/release-key.keystore -alias uca-release-key -keyalg RSA -keysize 2048 -validity 10000
+    keytool -genkey -v -keystore android/app/release-key.keystore -alias QuickC-release-key -keyalg RSA -keysize 2048 -validity 10000
 fi
 
 # Build release APK

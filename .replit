@@ -16,14 +16,14 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "UCA Backend"
+args = "QuickC Backend"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "UCA Frontend"
+args = "QuickC Frontend"
 
 [[workflows.workflow]]
-name = "UCA Backend"
+name = "QuickC Backend"
 author = "agent"
 
 [[workflows.workflow.tasks]]
@@ -35,7 +35,7 @@ waitForPort = 8000
 outputType = "console"
 
 [[workflows.workflow]]
-name = "UCA Frontend"
+name = "QuickC Frontend"
 author = "agent"
 
 [[workflows.workflow.tasks]]

@@ -1,6 +1,6 @@
 # Overview
 
-This is the Universal Cab Aggregator (UCA) application - a unified platform for booking rides from multiple providers (Uber, Ola, Rapido, etc.). The system normalizes ride options, displays comparative ETAs and fares, and allows users to either deep-link to provider apps or complete bookings directly through the platform. The backend is built with FastAPI and includes database models for managing bookings and drivers, with support for both mobile app integration and IVR (phone-based) booking channels.
+This is the QuickC application - a unified platform for booking rides from multiple providers (Uber, Ola, Rapido, etc.). The system normalizes ride options, displays comparative ETAs and fares, and allows users to either deep-link to provider apps or complete bookings directly through the platform. The backend is built with FastAPI and includes database models for managing bookings and drivers, with support for both mobile app integration and IVR (phone-based) booking channels.
 
 ## Current Status
 ✅ **Production System Complete**: Full-stack application ready for app store submission

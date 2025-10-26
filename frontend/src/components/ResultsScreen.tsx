@@ -14,7 +14,6 @@ const ResultsScreen = () => {
   const [filteredOffers, setFilteredOffers] = useState<RideOffer[]>([]);
   const [selectedSorts, setSelectedSorts] = useState(['price']);
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
-  const [searchData] = useState<any>(null);
 
   useEffect(() => {
     const results = sessionStorage.getItem('searchResults');
@@ -40,7 +39,7 @@ const ResultsScreen = () => {
         base_fare: offer.fare,
         total_fare: Math.round(offer.fare * (0.9 + Math.random() * 0.3)), // Add some variance
         surge_multiplier: Math.random() > 0.7 ? 1.2 + Math.random() * 0.8 : undefined,
-        deep_link: getDeepLink(getProviderForOffer(index), offer),
+        deep_link: getDeepLink(getProviderForOffer(index)),
         booking_link: `https://${getProviderForOffer(index).toLowerCase()}.com/book`
       }));
       
@@ -149,7 +148,7 @@ const ResultsScreen = () => {
     return mapping[oldType] || 'economy';
   };
 
-  const getDeepLink = (provider: string, offer: any): string => {
+  const getDeepLink = (provider: string): string => {
     // Real deep links for ride-hailing apps
     const deepLinks: { [key: string]: string } = {
       'Uber': 'https://m.uber.com/ul/',

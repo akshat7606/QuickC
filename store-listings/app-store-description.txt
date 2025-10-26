@@ -1,8 +1,8 @@
-UCA - Universal Cab Aggregator
+QuickC
 
 🚗 The Ultimate Ride Booking Solution
 
-UCA revolutionizes the way you book rides by bringing together all major cab services into one powerful app. Compare prices, check availability, and book your perfect ride - all in seconds.
+QuickC revolutionizes the way you book rides by bringing together all major cab services into one powerful app. Compare prices, check availability, and book your perfect ride - all in seconds.
 
 KEY FEATURES:
 
@@ -32,7 +32,7 @@ KEY FEATURES:
 • 24/7 customer support
 • Secure payment processing
 
-Why Choose UCA?
+Why Choose QuickC?
 
 ✅ Save Time: No need to check multiple apps
 ✅ Save Money: Always find the best deals
@@ -47,7 +47,7 @@ Perfect for:
 • Businesses requiring employee transport solutions
 • Anyone who values convenience and choice
 
-Download UCA today and experience the future of ride booking!
+Download QuickC today and experience the future of ride booking!
 
 ---
 
@@ -55,7 +55,7 @@ PRIVACY & SECURITY:
 We respect your privacy and protect your data with enterprise-grade security. Your location and payment information are encrypted and shared only with your chosen ride provider.
 
 SUPPORT:
-Need help? Contact us at support@uca.app or call our 24/7 helpline.
+Need help? Contact us at support@QuickC.app or call our 24/7 helpline.
 
 Compatible with iPhone and iPad.
 Requires iOS 13.0 or later.
