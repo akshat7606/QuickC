@@ -10,9 +10,20 @@ import uuid
 from typing import List, Optional
 from twilio.twiml.voice_response import VoiceResponse
 import random
+from dotenv import load_dotenv
+import time
+import asyncio
+from pathlib import Path
+
+# Load environment variables from a local .env file if present. This is optional and safe
+# for local development (do NOT commit your .env file to version control).
+load_dotenv()
 
 # Database setup
 import os
+from fastapi.middleware.cors import CORSMiddleware
+import httpx
+
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./cab_aggregator.db")
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
@@ -59,6 +70,27 @@ Base.metadata.create_all(bind=engine)
 
 # FastAPI app
 app = FastAPI(title="QuickC API", version="1.0.0")
+
+# CORS: allow frontend origins (comma-separated in FRONTEND_ORIGINS)
+FRONTEND_ORIGINS = os.getenv("FRONTEND_ORIGINS", "http://localhost:5173")
+allowed_origins = [o.strip() for o in FRONTEND_ORIGINS.split(",") if o.strip()]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# MapMyIndia server-side config (store these as env vars; never expose in frontend bundle)
+MAPMYINDIA_KEY = os.getenv("MAPMYINDIA_REST_KEY", "")
+MAPMYINDIA_CLIENT_ID = os.getenv("MAPMYINDIA_CLIENT_ID", "")
+MAPMYINDIA_CLIENT_SECRET = os.getenv("MAPMYINDIA_CLIENT_SECRET", "")
+
+if not MAPMYINDIA_KEY:
+    # Provide a clear error early when starting the app in interactive runs. Do not
+    # fail hard in all contexts because some deployments may set env vars differently.
+    print("WARNING: MAPMYINDIA_REST_KEY is not set. MapMyIndia proxy endpoints will return 500 until configured.")
 
 # Pydantic models
 class SearchRequest(BaseModel):
@@ -203,7 +235,7 @@ async def book_ride(request: BookRequest):
             eta_minutes=calculate_eta(),
             status="confirmed",
             channel="APP",
-            raw_data=request.dict()
+            raw_data=request.model_dump()
         )
         
         db.add(booking)
@@ -304,6 +336,264 @@ async def partner_health():
             "ivr_system": "online"
         }
     }
+
+@app.get("/v1/mapmyindia/autocomplete")
+async def mapmyindia_autocomplete(query: str):
+    """Proxy autocomplete request to MapMyIndia using the server-side REST key.
+    Returns the raw MapMyIndia JSON response. When debug mode is enabled, return
+    recent sanitized upstream logs on failure to aid debugging.
+    """
+    if not MAPMYINDIA_KEY and not (MAPMYINDIA_CLIENT_ID and MAPMYINDIA_CLIENT_SECRET):
+        raise HTTPException(status_code=500, detail="MapMyIndia REST key is not configured on the server")
+    try:
+        status, data = await call_mapmyindia_autocomplete(query)
+        return data
+    except HTTPException as e:
+        # If debug mode is enabled, return the last few sanitized log entries to help debugging
+        if os.getenv("MAPMYINDIA_DEBUG", "") == "true":
+            entries = []
+            if LOG_FILE.exists():
+                with LOG_FILE.open("r", encoding="utf-8") as f:
+                    lines = f.read().splitlines()
+                for line in lines[-5:]:
+                    try:
+                        entries.append(json.loads(line))
+                    except Exception:
+                        continue
+            return {"error": str(e.detail), "sanitized_logs": entries}
+        raise
+
+@app.get("/v1/mapmyindia/reverse")
+async def mapmyindia_reverse(lat: float, lng: float):
+    """Proxy reverse geocode request to MapMyIndia using the server-side REST key.
+    Returns the raw MapMyIndia JSON response. When debug mode is enabled, return
+    recent sanitized upstream logs on failure to aid debugging.
+    """
+    if not MAPMYINDIA_KEY and not (MAPMYINDIA_CLIENT_ID and MAPMYINDIA_CLIENT_SECRET):
+        raise HTTPException(status_code=500, detail="MapMyIndia REST key is not configured on the server")
+    try:
+        status, data = await call_mapmyindia_reverse(lat, lng)
+        return data
+    except HTTPException as e:
+        if os.getenv("MAPMYINDIA_DEBUG", "") == "true":
+            entries = []
+            if LOG_FILE.exists():
+                with LOG_FILE.open("r", encoding="utf-8") as f:
+                    lines = f.read().splitlines()
+                for line in lines[-5:]:
+                    try:
+                        entries.append(json.loads(line))
+                    except Exception:
+                        continue
+            return {"error": str(e.detail), "sanitized_logs": entries}
+        raise
+
+# In-memory OAuth token cache for MapMyIndia (local only)
+_mapmyindia_token = None
+_mapmyindia_token_expires_at = 0
+_mapmyindia_token_lock = asyncio.Lock()
+
+# Logging setup (sanitized, local-only)
+LOG_FILE = Path("./mapmyindia_errors.log")
+ADMIN_TOKEN = os.getenv("MAPMYINDIA_ADMIN_TOKEN", "")
+
+def append_sanitized_log(entry: dict):
+    # Keep logs small and avoid storing secrets
+    try:
+        entry_copy = {k: entry.get(k) for k in ("timestamp","endpoint","params","upstream_status","upstream_headers","note")}
+        with LOG_FILE.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(entry_copy, ensure_ascii=False) + "\n")
+    except Exception as e:
+        print("Failed to write mapmyindia error log:", e)
+
+@app.get("/v1/mapmyindia/logs")
+async def mapmyindia_logs(limit: int = 20, admin_token: str = ""):
+    """Return last `limit` sanitized log entries. Requires ADMIN_TOKEN to be set and matched.
+    Use only in local/dev. Do NOT enable in production without securing the endpoint.
+    """
+    if not ADMIN_TOKEN:
+        raise HTTPException(status_code=403, detail="Admin logging is not enabled on the server")
+    if admin_token != ADMIN_TOKEN:
+        raise HTTPException(status_code=403, detail="Invalid admin token")
+
+    if not LOG_FILE.exists():
+        return {"entries": []}
+
+    entries = []
+    with LOG_FILE.open("r", encoding="utf-8") as f:
+        lines = f.read().splitlines()
+    for line in lines[-limit:]:
+        try:
+            entries.append(json.loads(line))
+        except Exception:
+            continue
+    return {"entries": entries}
+
+async def fetch_oauth_token():
+    """Fetch or return cached MapMyIndia OAuth token using client credentials.
+    Returns access_token str or raises HTTPException on failure.
+    """
+    global _mapmyindia_token, _mapmyindia_token_expires_at
+    # Fast path: return cached token if still valid (with 30s buffer)
+    if _mapmyindia_token and time.time() < (_mapmyindia_token_expires_at - 30):
+        return _mapmyindia_token
+
+    async with _mapmyindia_token_lock:
+        if _mapmyindia_token and time.time() < (_mapmyindia_token_expires_at - 30):
+            return _mapmyindia_token
+
+        if not MAPMYINDIA_CLIENT_ID or not MAPMYINDIA_CLIENT_SECRET:
+            raise HTTPException(status_code=500, detail="MapMyIndia client credentials are not configured on the server")
+
+        token_url = "https://outpost.mapmyindia.com/api/security/oauth/token"
+        data = {
+            "grant_type": "client_credentials",
+            "client_id": MAPMYINDIA_CLIENT_ID,
+            "client_secret": MAPMYINDIA_CLIENT_SECRET
+        }
+        async with httpx.AsyncClient() as client:
+            try:
+                resp = await client.post(token_url, data=data, timeout=10.0)
+                resp.raise_for_status()
+                body = resp.json()
+                access_token = body.get("access_token")
+                expires_in = int(body.get("expires_in", 0))
+                if not access_token:
+                    raise HTTPException(status_code=502, detail="Failed to obtain MapMyIndia access token")
+
+                _mapmyindia_token = access_token
+                _mapmyindia_token_expires_at = time.time() + max(expires_in, 60)
+                print("MapMyIndia: obtained access token (expires_in=", expires_in, ")")
+                return _mapmyindia_token
+            except httpx.HTTPStatusError as e:
+                detail = e.response.text if getattr(e, 'response', None) else str(e)
+                print("MapMyIndia token exchange failed:", e.response.status_code, detail)
+                raise HTTPException(status_code=502, detail=f"MapMyIndia token exchange failed: {e.response.status_code}")
+            except Exception as e:
+                print("MapMyIndia token exchange exception:", str(e))
+                raise HTTPException(status_code=502, detail=f"Failed to fetch MapMyIndia token: {str(e)}")
+
+async def _call_mapmyindia(url: str, params: dict, headers: Optional[dict] = None):
+    """Call MapMyIndia and return (status_code, body, headers).
+    Do not raise on non-2xx so callers can inspect status and decide whether to
+    fallback to the OAuth flow or return an informative error to clients.
+    """
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(url, params=params, headers=headers, timeout=10.0)
+        # Try parse JSON if possible, otherwise return text
+        try:
+            body = resp.json()
+        except Exception:
+            body = resp.text
+        # Return headers as a regular dict (safe to log selected keys)
+        return resp.status_code, body, dict(resp.headers)
+
+async def call_mapmyindia_autocomplete(query: str):
+    """Call MapMyIndia autocomplete: try REST key path first; on 401/412 try OAuth token fallback."""
+    params = {"query": query}
+
+    # 1) Try REST-key-in-path if configured
+    if MAPMYINDIA_KEY:
+        url_with_key = f"https://apis.mapmyindia.com/advancedmaps/v1/{MAPMYINDIA_KEY}/autocomplete"
+        status, data, upstream_headers = await _call_mapmyindia(url_with_key, params)
+        if status == 200:
+            return status, data
+        # record sanitized log with a truncated body (avoid storing secrets)
+        try:
+            append_sanitized_log({
+                "timestamp": datetime.utcnow().isoformat(),
+                "endpoint": "autocomplete (restkey)",
+                "params": {"query": query},
+                "upstream_status": status,
+                "upstream_headers": {k: v for k, v in upstream_headers.items() if k.lower() in ("x-cache", "via", "x-amz-cf-id", "server")},
+                "note": "REST key path failed",
+                # include small excerpt of body when debug enabled
+                "body_excerpt": (json.dumps(data)[:1000] if os.getenv("MAPMYINDIA_DEBUG", "") == "true" else None)
+            })
+        except Exception:
+            pass
+        if status not in (401, 412):
+            if os.getenv("MAPMYINDIA_DEBUG", "") == "true":
+                raise HTTPException(status_code=502, detail=f"MapMyIndia returned {status}: {json.dumps(data) if isinstance(data,(dict,list)) else str(data)}")
+            raise HTTPException(status_code=502, detail=f"MapMyIndia returned {status}")
+        # else fall through to token flow (401/412)
+
+    # 2) Try OAuth client_credentials flow (if configured)
+    if MAPMYINDIA_CLIENT_ID and MAPMYINDIA_CLIENT_SECRET:
+        token = await fetch_oauth_token()
+        auth_url = "https://apis.mapmyindia.com/advancedmaps/v1/autocomplete"
+        headers = {"Authorization": f"Bearer {token}"}
+        s2, data2, upstream_headers2 = await _call_mapmyindia(auth_url, params, headers=headers)
+        if s2 == 200:
+            return s2, data2
+        try:
+            append_sanitized_log({
+                "timestamp": datetime.utcnow().isoformat(),
+                "endpoint": "autocomplete (oauth)",
+                "params": {"query": query},
+                "upstream_status": s2,
+                "upstream_headers": {k: v for k, v in upstream_headers2.items() if k.lower() in ("x-cache", "via", "x-amz-cf-id", "server")},
+                "note": "OAuth fallback failed",
+                "body_excerpt": (json.dumps(data2)[:1000] if os.getenv("MAPMYINDIA_DEBUG", "") == "true" else None)
+            })
+        except Exception:
+            pass
+        if os.getenv("MAPMYINDIA_DEBUG", "") == "true":
+            raise HTTPException(status_code=502, detail=f"MapMyIndia returned {s2}: {json.dumps(data2) if isinstance(data2,(dict,list)) else str(data2)}")
+        raise HTTPException(status_code=502, detail=f"MapMyIndia returned {s2}")
+
+    # No valid auth method succeeded
+    raise HTTPException(status_code=502, detail="No valid MapMyIndia credentials available or all auth methods failed")
+
+async def call_mapmyindia_reverse(lat: float, lng: float):
+    params = {"lat": lat, "lng": lng}
+
+    if MAPMYINDIA_KEY:
+        url_with_key = f"https://apis.mapmyindia.com/advancedmaps/v1/{MAPMYINDIA_KEY}/rev_geocode"
+        status, data, upstream_headers = await _call_mapmyindia(url_with_key, params)
+        if status == 200:
+            return status, data
+        try:
+            append_sanitized_log({
+                "timestamp": datetime.utcnow().isoformat(),
+                "endpoint": "reverse (restkey)",
+                "params": {"lat": lat, "lng": lng},
+                "upstream_status": status,
+                "upstream_headers": {k: v for k, v in upstream_headers.items() if k.lower() in ("x-cache", "via", "x-amz-cf-id", "server")},
+                "note": "REST key reverse failed",
+                "body_excerpt": (json.dumps(data)[:1000] if os.getenv("MAPMYINDIA_DEBUG", "") == "true" else None)
+            })
+        except Exception:
+            pass
+        if status not in (401, 412):
+            if os.getenv("MAPMYINDIA_DEBUG", "") == "true":
+                raise HTTPException(status_code=502, detail=f"MapMyIndia returned {status}: {json.dumps(data) if isinstance(data,(dict,list)) else str(data)}")
+            raise HTTPException(status_code=502, detail=f"MapMyIndia returned {status}")
+        # else fall through to OAuth flow
+
+    if MAPMYINDIA_CLIENT_ID and MAPMYINDIA_CLIENT_SECRET:
+        token = await fetch_oauth_token()
+        auth_url = "https://apis.mapmyindia.com/advancedmaps/v1/rev_geocode"
+        headers = {"Authorization": f"Bearer {token}"}
+        s2, data2, upstream_headers2 = await _call_mapmyindia(auth_url, params, headers=headers)
+        if s2 == 200:
+            return s2, data2
+        print(f"OAuth reverse call failed with {s2}: {data2}")
+        try:
+            append_sanitized_log({
+                "timestamp": datetime.utcnow().isoformat(),
+                "endpoint": "reverse (oauth)",
+                "params": {"lat": lat, "lng": lng},
+                "upstream_status": s2,
+                "upstream_headers": {k: v for k, v in upstream_headers2.items() if k.lower() in ("x-cache", "via", "x-amz-cf-id", "server")},
+                "note": "OAuth fallback failed (reverse)",
+                "body_excerpt": (json.dumps(data2)[:1000] if os.getenv("MAPMYINDIA_DEBUG", "") == "true" else None)
+            })
+        except Exception:
+            pass
+        if os.getenv("MAPMYINDIA_DEBUG", "") == "true":
+            raise HTTPException(status_code=502, detail=f"MapMyIndia returned {s2}: {json.dumps(data2) if isinstance(data2,(dict,list)) else str(data2)}")
+        raise HTTPException(status_code=502, detail=f"MapMyIndia returned {s2}")
 
 if __name__ == "__main__":
     import uvicorn

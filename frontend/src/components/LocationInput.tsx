@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { locationService } from '../services/locationService';
 import type { LocationSuggestion } from '../services/locationService';
 import { useKeyboardAdjustment } from '../hooks/useKeyboardAdjustment';
+import { autocomplete as mapmyindiaAutocomplete } from '../services/mapmyindiaService';
 
 interface LocationInputProps {
   label: string;
@@ -13,11 +14,17 @@ interface LocationInputProps {
 
 const LocationInput = ({ label, placeholder, value, onChange, showCurrentLocation = false }: LocationInputProps) => {
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [isSuggesting, setIsSuggesting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+  const debounceTimer = useRef<number | null>(null);
   const { isKeyboardOpen } = useKeyboardAdjustment();
+
+  // fetchId to ignore stale async responses
+  const fetchIdRef = useRef(0);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -35,38 +42,107 @@ const LocationInput = ({ label, placeholder, value, onChange, showCurrentLocatio
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const fetchSuggestions = async (query: string) => {
+    // Only query autocomplete for meaningful queries
+    if (!query || query.trim().length < 2) {
+      setSuggestions([]);
+      setIsSuggesting(false);
+      setShowSuggestions(false);
+      setErrorMessage(null);
+      return;
+    }
+
+    const cleaned = query.trim();
+
+    // Immediately show local suggestions so the UI feels snappy
+    try {
+      const local = locationService.searchLocations(cleaned);
+      setSuggestions(local);
+      setShowSuggestions(local.length > 0);
+    } catch (e) {
+      // ignore local search errors
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+
+    setIsSuggesting(true);
+    setErrorMessage(null);
+
+    const thisFetchId = ++fetchIdRef.current;
+
+    // Try MapMyIndia autocomplete
+    try {
+      const remote = await mapmyindiaAutocomplete(cleaned);
+
+      // If another fetch started after this one, ignore this result (stale)
+      if (fetchIdRef.current !== thisFetchId) {
+        return;
+      }
+
+      if (remote && remote.length > 0) {
+        setSuggestions(remote);
+        setIsSuggesting(false);
+        setShowSuggestions(true);
+        return;
+      }
+
+      // If remote returned no results, keep local suggestions (we already set them)
+      setIsSuggesting(false);
+      setShowSuggestions((prev) => prev || false);
+    } catch (err: any) {
+      // If the request was aborted or a stale result, just return
+      if (err?.name === 'CanceledError' || err?.name === 'AbortError') return;
+
+      // Keep full details in console for debugging, but show a concise message to users
+      console.warn('Remote autocomplete error (full details):', err);
+      setErrorMessage('Address lookup is temporarily unavailable — showing local suggestions');
+
+      // Keep local suggestions already shown earlier
+      setIsSuggesting(false);
+      setShowSuggestions((prev) => prev || false);
+    }
+  };
+
+  const debouncedFetch = (query: string) => {
+    if (debounceTimer.current) {
+      window.clearTimeout(debounceTimer.current);
+    }
+    // Reduced debounce to 200ms for snappier suggestions
+    debounceTimer.current = window.setTimeout(() => {
+      void fetchSuggestions(query);
+    }, 200);
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     onChange(inputValue);
-    
-    // Show suggestions immediately like Uber does
-    const locationSuggestions = locationService.searchLocations(inputValue);
-    setSuggestions(locationSuggestions);
-    setShowSuggestions(true);
+
+    // fetch suggestions async
+    debouncedFetch(inputValue);
   };
 
   const handleInputFocus = () => {
-    // Always show suggestions when focused, like Uber
-    const locationSuggestions = locationService.searchLocations(value);
-    setSuggestions(locationSuggestions);
-    setShowSuggestions(true);
+    // Show suggestions only if there is a query
+    if (value && value.trim().length >= 2) debouncedFetch(value);
   };
 
   const handleSuggestionClick = (suggestion: LocationSuggestion) => {
-    const formattedLocation = locationService.formatLocation(suggestion);
+    const formattedLocation = `${suggestion.name}`; // keep display concise
     onChange(formattedLocation, suggestion);
     setShowSuggestions(false);
   };
 
   const handleCurrentLocation = async () => {
     if (!showCurrentLocation) return;
-    
+
     setIsLoadingLocation(true);
     try {
       const userLocation = await locationService.getCurrentLocation();
       const locationText = userLocation.address || `Current Location (${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)})`;
       const locationData: LocationSuggestion = {
+        id: `current-${Date.now()}`,
         name: 'Current Location',
+        description: userLocation.address || locationText,
         lat: userLocation.latitude,
         lng: userLocation.longitude,
         type: 'current'
@@ -94,7 +170,7 @@ const LocationInput = ({ label, placeholder, value, onChange, showCurrentLocatio
           onFocus={handleInputFocus}
           style={{ paddingRight: showCurrentLocation ? '50px' : '12px' }}
         />
-        
+
         {showCurrentLocation && (
           <button
             type="button"
@@ -136,6 +212,9 @@ const LocationInput = ({ label, placeholder, value, onChange, showCurrentLocatio
             overflowY: 'auto'
           }}
         >
+          {isSuggesting && (
+            <div style={{ padding: '8px 12px', color: '#666', fontSize: '13px' }}>Searching…</div>
+          )}
           {suggestions.map((suggestion, index) => (
             <div
               key={suggestion.id}
@@ -163,8 +242,16 @@ const LocationInput = ({ label, placeholder, value, onChange, showCurrentLocatio
           ))}
         </div>
       )}
+
+      {/* Inline error when autocomplete fails (useful in debug mode) */}
+      {errorMessage && (
+        <div style={{ color: 'crimson', whiteSpace: 'pre-wrap', marginTop: '8px', fontSize: '13px' }}>
+          ⚠️ {errorMessage}
+        </div>
+      )}
     </div>
   );
 };
 
 export default LocationInput;
+

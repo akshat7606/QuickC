@@ -4,6 +4,8 @@ export interface LocationSuggestion {
   description: string;
   lat: number;
   lng: number;
+  type?: string; // optional marker for special suggestions (e.g. 'current')
+  distance?: number; // optional distance (km) when returning nearby results
 }
 
 export interface UserLocation {

@@ -29,5 +29,9 @@
   "bugs": {
     "url": "https://github.com/QuickC-team/universal-cab-aggregator/issues"
   },
-  "homepage": "https://QuickC.app"
+  "homepage": "https://QuickC.app",
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "react-leaflet": "^5.0.0"
+  }
 }

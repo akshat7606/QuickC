@@ -32,6 +32,15 @@ const SearchScreen = () => {
   const handlePinLocation = (type: 'pickup' | 'destination') => {
     setMapFor(type);
     setShowMap(true);
+    // Trigger the LocationMap's explicit invalidate/refresh events shortly after opening.
+    // LocationMap listens for these ('quickc:map:invalidate' and 'quickc:map:refresh') and
+    // will call invalidateSize(true) and attempt to redraw tiles. This is more reliable than
+    // a generic window resize when the map is mounted inside a modal.
+    setTimeout(() => {
+      try { window.dispatchEvent(new Event('quickc:map:invalidate')); } catch (e) {}
+      // A slightly later refresh helps in case the first invalidate runs before CSS transitions finish
+      setTimeout(() => { try { window.dispatchEvent(new Event('quickc:map:refresh')); } catch (e) {} }, 220);
+    }, 350);
   };
 
   const handleMapLocationSelect = (location: LocationSuggestion) => {
@@ -282,6 +291,8 @@ const SearchScreen = () => {
               pickupLocation={pickupLocation}
               destinationLocation={destinationLocation}
               height="400px"
+              onSelect={handleMapLocationSelect}
+              visible={showMap}
             />
           </div>
         </div>
