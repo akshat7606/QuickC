@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, JSON
 from sqlalchemy.ext.declarative import declarative_base
@@ -173,6 +174,11 @@ def calculate_eta(distance_km: float = 5.0) -> int:
 
 @app.get("/")
 async def root():
+    # If the frontend build exists, serve the SPA index.html at the root.
+    build_dir = Path(__file__).parent / "frontend" / "build"
+    index_file = build_dir / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
     return {"message": "QuickC API", "status": "running"}
 
 @app.post("/v1/search", response_model=SearchResponse)
@@ -595,6 +601,24 @@ async def call_mapmyindia_reverse(lat: float, lng: float):
             raise HTTPException(status_code=502, detail=f"MapMyIndia returned {s2}: {json.dumps(data2) if isinstance(data2,(dict,list)) else str(data2)}")
         raise HTTPException(status_code=502, detail=f"MapMyIndia returned {s2}")
 
+# Serve the built frontend if present (mounted after API routes so /v1/* keep working)
+build_dir = Path(__file__).parent / "frontend" / "build"
+if build_dir.exists():
+    app.mount("/", StaticFiles(directory=str(build_dir), html=True), name="frontend")
+else:
+    print(f"Frontend build not found at {build_dir}. Run: cd frontend && npm ci && npm run build")
+    
+# SPA fallback for non-API routes (ensures client-side routing works)
+@app.get("/{full_path:path}")
+async def spa_fallback(full_path: str):
+    # Keep API prefixes returning 404 so they are handled by API layer
+    if full_path.startswith("v1") or full_path.startswith("api") or full_path.startswith("openapi") or full_path.startswith("docs"):
+        raise HTTPException(status_code=404, detail="API route not found")
+    index_file = build_dir / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    raise HTTPException(status_code=404, detail="index.html not found; build the frontend first")
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=3000)

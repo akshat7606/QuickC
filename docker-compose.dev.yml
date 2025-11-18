@@ -1,0 +1,37 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-}
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - MAPMYINDIA_REST_KEY=${MAPMYINDIA_REST_KEY}
+      - MAPMYINDIA_CLIENT_ID=${MAPMYINDIA_CLIENT_ID}
+      - MAPMYINDIA_CLIENT_SECRET=${MAPMYINDIA_CLIENT_SECRET}
+      - FRONTEND_ORIGINS=${FRONTEND_ORIGINS}
+      - VITE_API_URL=${VITE_API_URL}
+    restart: unless-stopped
+
+  frontend-dev:
+    image: node:20-alpine
+    working_dir: /usr/src/app/frontend
+    ports:
+      - "5173:5173"
+    environment:
+      # Make the frontend dev server call the backend service by its compose name
+      - VITE_API_URL=http://app:8000
+    volumes:
+      - ./frontend:/usr/src/app/frontend:cached
+      - /usr/src/app/frontend/node_modules
+    command: sh -c "npm ci --silent || true && npm run dev -- --host 0.0.0.0 --port 5173"
+    depends_on:
+      - app
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Pass VITE_API_URL at build time if you want to embed API URL into frontend
+        VITE_API_URL: ${VITE_API_URL:-}
+    ports:
+      - "8000:8000"
+    environment:
+      # Runtime envs (can be set in a .env file or environment)
+      - DATABASE_URL=${DATABASE_URL}
+      - MAPMYINDIA_REST_KEY=${MAPMYINDIA_REST_KEY}
+      - MAPMYINDIA_CLIENT_ID=${MAPMYINDIA_CLIENT_ID}
+      - MAPMYINDIA_CLIENT_SECRET=${MAPMYINDIA_CLIENT_SECRET}
+      - FRONTEND_ORIGINS=${FRONTEND_ORIGINS}
+      - VITE_API_URL=${VITE_API_URL}
+    # For production use we should not bind-mount the whole repo into the container
+    # because it overwrites files baked into the image (including the built frontend).
+    # If you need live reload during development, re-enable the bind mount and run
+    # `npm run build` on the host so `frontend/build` exists.
+    # volumes:
+    #   - ./:/app:cached
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-}
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    restart: unless-stopped
